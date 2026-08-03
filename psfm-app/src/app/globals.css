@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  /* Ink — deep botanical teal, the fellowship's base tone */
+  --ink: #14261F;
+  --ink-soft: #1C332B;
+  --panel: #1F3B33;
+  --panel-raised: #274A40;
+  --hairline: rgba(243, 236, 219, 0.12);
+
+  /* Paper — warm parchment used only for light surfaces (cards, forms) */
+  --paper: #FBF7EE;
+  --paper-dim: #EFE8D6;
+  --ink-on-paper: #1C2E27;
+
+  /* Accents — candle marigold (primary), coral ember (sparing) */
+  --marigold: #E8A33D;
+  --marigold-soft: #F3C879;
+  --ember: #E8663D;
+  --sage: #9FBFA9;
+  --cream: #F5EFDD;
+
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-ink-on-paper: var(--ink-on-paper);
+  --color-marigold: var(--marigold);
+  --color-marigold-soft: var(--marigold-soft);
+  --color-ember: var(--ember);
+  --color-sage: var(--sage);
+  --color-cream: var(--cream);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  border-color: var(--hairline);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.font-data {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--marigold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
