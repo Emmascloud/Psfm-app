@@ -1,14 +1,19 @@
 import Link from "next/link";
 
+const WHATSAPP_LINK = "https://chat.whatsapp.com/HvtFvjtZzlD4rHcw8wgkW6?s=cl&p=a&mlu=4";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-ink">
       <div className="mx-auto max-w-5xl px-6 py-16 md:py-24">
         <header className="flex items-center justify-between mb-20">
           <span className="font-display text-lg tracking-wide text-cream">
-            PSFM <span className="text-marigold">Circle</span>
+            PSMF <span className="text-marigold">Family</span>
           </span>
           <nav className="flex items-center gap-6 font-data text-sm">
+            <Link href="/rules" className="text-sage hover:text-cream transition-colors hidden sm:inline">
+              Group rules
+            </Link>
             <Link href="/login" className="text-sage hover:text-cream transition-colors">
               Sign in
             </Link>
@@ -16,7 +21,7 @@ export default function Home() {
               href="/signup"
               className="rounded-full bg-marigold px-4 py-2 text-ink-on-paper font-medium hover:bg-marigold-soft transition-colors"
             >
-              Join the circle
+              Join the family
             </Link>
           </nav>
         </header>
@@ -24,18 +29,18 @@ export default function Home() {
         <section className="grid md:grid-cols-[1.2fr_0.8fr] gap-16 items-center">
           <div>
             <p className="font-data text-sm text-marigold mb-4 tracking-widest uppercase">
-              Peculiar Singles &amp; Married
+              Peculiar Singles &amp; Married Forum
             </p>
             <h1 className="font-display text-5xl md:text-6xl leading-[1.05] text-cream mb-6">
               Kept, and keeping
               <br /> each other.
             </h1>
-            <p className="font-body text-lg text-sage max-w-md mb-10 leading-relaxed">
-              One place for the fellowship to hold its birthdays and
-              anniversaries — so no one in the circle is forgotten on their
-              day.
+            <p className="font-body text-lg text-sage max-w-md mb-6 leading-relaxed">
+              A relationship platform of over 1,000 members, built around one
+              WhatsApp community — where no one's birthday or anniversary
+              gets lost in the group chat.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
               <Link
                 href="/signup"
                 className="rounded-full bg-marigold px-6 py-3 font-body font-medium text-ink-on-paper hover:bg-marigold-soft transition-colors"
@@ -49,6 +54,14 @@ export default function Home() {
                 I already have an account
               </Link>
             </div>
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-6 font-data text-sm text-sage hover:text-marigold transition-colors"
+            >
+              Not yet in the WhatsApp group? Join here →
+            </a>
           </div>
 
           <DecorativeRing />
@@ -68,9 +81,15 @@ export default function Home() {
           <Feature
             eyebrow="03"
             title="Only for members"
-            body="Dates are visible to signed-in fellowship members only — never public, never searchable."
+            body="Dates are visible to signed-in members only — never public, never searchable."
           />
         </section>
+
+        <footer className="mt-16 pt-8 border-t border-hairline">
+          <Link href="/rules" className="font-data text-sm text-sage hover:text-cream transition-colors">
+            Read the group rules →
+          </Link>
+        </footer>
       </div>
     </main>
   );

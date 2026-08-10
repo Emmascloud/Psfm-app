@@ -111,3 +111,27 @@ export async function updateProfile(
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
+
+export async function toggleSuspension(userId: string, suspend: boolean) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in." };
+
+  const { data: me } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  if (!me?.is_admin) return { error: "Admins only." };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ is_suspended: suspend })
+    .eq("id", userId);
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin");
+  return { error: null };
+}

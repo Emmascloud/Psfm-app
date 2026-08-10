@@ -11,6 +11,8 @@ export type Profile = {
   birth_day: number; // 1-31
   anniversary_month: number | null;
   anniversary_day: number | null;
+  is_admin: boolean;
+  is_suspended: boolean;
   updated_at: string;
 };
 
