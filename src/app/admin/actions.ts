@@ -33,6 +33,13 @@ export async function adminDeleteComment(commentId: string) {
   revalidatePath("/admin");
 }
 
+export async function adminDeleteMessage(messageId: string) {
+  const { supabase, ok } = await requireAdmin();
+  if (!ok) return;
+  await supabase.from("messages").delete().eq("id", messageId);
+  revalidatePath("/admin");
+}
+
 export async function dismissReport(reportId: string) {
   const { supabase, ok } = await requireAdmin();
   if (!ok) return;

@@ -3,32 +3,26 @@
 PSFM — Peculiar Single and Married Forum — is a relationship platform
 where singles and married members come together to learn and talk about
 relationships. This is its members-only companion site: sign in, keep
-your own dates and photo current, post to your timeline, browse the
-group rules, and (for admins) moderate members and reported content.
-Built with Next.js (App Router) + Supabase.
+your own dates and photo current, post to a shared feed or your own
+timeline, chat live with the family, browse the group rules, and (for
+admins) moderate members and reported content. Built with Next.js (App
+Router) + Supabase.
 
-## 1. Database setup — run these in order
+## 1. Database setup — run in order, each file's sections separately
 
-SQL Editor → New query → paste → Run → clear → next one. Do not paste
-several files' contents into one query box; comments can merge lines and
-throw syntax errors.
+SQL Editor → New query → paste one numbered section → Run → clear →
+next section. Don't paste a whole multi-section file at once — comments
+can merge lines together and throw syntax errors, as happened before.
 
-1. `supabase/schema.sql` — profiles table + base policies.
-2. `supabase/migration_02_admin.sql` — `is_admin` / `is_suspended` +
-   the admin-can-update-any-profile policy. **Run the two statements in
-   this file as two separate pastes** (the `alter table` block, then the
-   `create policy` block) — pasting them together as one block with the
-   explanatory comments in between is what caused the syntax error you
-   hit earlier.
-3. `supabase/migration_03_social.sql` — avatar column, `posts`,
-   `comments`, `reports` tables and their policies, plus the `media`
-   storage bucket. This file is already split into five numbered
-   sections — paste and run each one separately, same reason as above.
+1. `supabase/schema.sql`
+2. `supabase/migration_02_admin.sql` (2 sections)
+3. `supabase/migration_03_social.sql` (5 sections)
+4. `supabase/migration_04_chat.sql` (3 sections) — **new this round**:
+   creates the `messages` table for live chat, lets members report a
+   chat message (widens the existing `reports` table), and turns on
+   Supabase Realtime for `messages` so chat updates without a refresh.
 
 ### Making yourself an admin
-
-After you've signed up on the live site yourself, run (with your real
-email):
 
 ```sql
 update public.profiles set is_admin = true
@@ -37,7 +31,7 @@ update public.profiles set is_admin = true
 
 ## 2. Environment variables
 
-Three now, all required:
+Still three, unchanged from last round:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=...
@@ -45,50 +39,37 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
-All three from Supabase → Project Settings → API. Set them locally in
-`.env.local` (copy `.env.local.example`) and on Vercel under Settings →
-Environment Variables (Production ticked), then **redeploy** — Next.js
-bakes `NEXT_PUBLIC_*` values in at build time, so saving them alone
-doesn't do anything until the next build runs.
+If `/admin` is showing "Couldn't load member emails," that specific
+variable isn't set (or isn't set for Production) on Vercel yet — add it
+under Settings → Environment Variables, tick Production, then redeploy.
+This one doesn't crash the page anymore, but it does mean that one
+column stays empty until it's set.
 
-If `SUPABASE_SERVICE_ROLE_KEY` is missing or wrong, `/admin` now
-degrades gracefully — you'll see a banner saying member emails couldn't
-load, instead of the page crashing with a 500 like before.
+## What's new this round
 
-## What's in here
+- **Responsive app shell** — every signed-in page now shares one
+  layout: a persistent left sidebar with all navigation on desktop
+  (`lg` breakpoint and up), collapsing to a sticky top bar with a
+  hamburger menu on mobile/tablet. This replaced the per-page headers
+  that were making the site feel static and inconsistent.
+- **Feed** (`/dashboard/feed`) — every member's timeline posts in one
+  scrollable, newest-first stream, Facebook/X-style, with a "share
+  something" box at the top that posts to your own timeline. This is
+  the answer to "the timeline is hard to find" — it's now in the main
+  nav, not buried on each profile.
+- **Family chat** (`/dashboard/chat`) — one shared, real-time room.
+  Messages appear instantly for everyone via Supabase Realtime, no
+  refresh needed. Anyone can report a message; the sender or an admin
+  can delete one outright.
+- **Admin's Reported content** section now covers messages too, not
+  just posts/comments.
 
-- `/` — public landing page. Links to group rules and the WhatsApp group.
-- `/rules` — the group's rules, public, no sign-in required.
-- `/signup`, `/login` — email + password auth.
-- `/dashboard` — "Coming up" list (with photos) and **The Circle**, the
-  radial birthday/anniversary wheel.
-- `/dashboard/members` — directory with photos; click through to a
-  profile.
-- `/dashboard/members/[id]` — a member's profile **and timeline**: posts
-  they've shared (text + optional photo), with comments from any
-  member. Only the profile owner can post to their own timeline;
-  everyone can comment. Anyone can report a post or comment they
-  didn't write; the post/comment owner or an admin can delete it
-  outright.
-- `/dashboard/profile` — edit your own info, including your profile
-  photo (upload, 5MB limit, stored in Supabase Storage).
-- `/admin` — admins only. Member list with Suspend/Unsuspend, plus a
-  **Reported content** section showing anything members have flagged,
-  with one-click delete or dismiss.
-- Every page has a small "← Home" link back to `/`, in addition to the
-  in-app navigation.
+## Still true from before
 
-## Not built yet: live chat room
-
-Deliberately still held back. The timeline + comments above cover the
-"forum" half of the original ask in a moderatable, async form — reports
-go straight to `/admin`, and delete is one click. A real-time chat room
-is a bigger step up in moderation load (nothing to review before it's
-seen), so it's worth building only once this async layer has been used
-for a while and feels solid.
-
-## Loading the existing WhatsApp list
-
-Still applies from before: the 150+ names already collected aren't in
-this database yet, since each row is tied to a real signed-up account.
-Either let people self-serve, or ask for a bulk-seed script.
+- Only the profile owner posts to their own timeline; anyone can
+  comment. Anyone can report a post/comment/message they didn't write;
+  the owner or an admin can delete it. Suspending a member in `/admin`
+  signs them out and blocks them at the middleware level.
+- The 150+ names already collected in WhatsApp aren't in this database
+  yet — each row is tied to a real signed-up account. Either let people
+  self-serve, or ask for a bulk-seed script.

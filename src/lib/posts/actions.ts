@@ -17,6 +17,7 @@ export async function createPost(profileId: string, body: string, imageUrl: stri
 
   if (error) return { error: error.message };
   revalidatePath(`/dashboard/members/${profileId}`);
+  revalidatePath("/dashboard/feed");
   return { error: null };
 }
 
@@ -24,6 +25,7 @@ export async function deletePost(postId: string, profileId: string) {
   const supabase = await createClient();
   await supabase.from("posts").delete().eq("id", postId);
   revalidatePath(`/dashboard/members/${profileId}`);
+  revalidatePath("/dashboard/feed");
 }
 
 export async function createComment(postId: string, profileId: string, body: string) {
@@ -40,6 +42,7 @@ export async function createComment(postId: string, profileId: string, body: str
 
   if (error) return { error: error.message };
   revalidatePath(`/dashboard/members/${profileId}`);
+  revalidatePath("/dashboard/feed");
   return { error: null };
 }
 
@@ -47,6 +50,7 @@ export async function deleteComment(commentId: string, profileId: string) {
   const supabase = await createClient();
   await supabase.from("comments").delete().eq("id", commentId);
   revalidatePath(`/dashboard/members/${profileId}`);
+  revalidatePath("/dashboard/feed");
 }
 
 export async function reportContent(
@@ -64,4 +68,5 @@ export async function reportContent(
     .from("reports")
     .insert({ target_type: targetType, target_id: targetId, reporter_id: user.id });
   revalidatePath(`/dashboard/members/${profileId}`);
+  revalidatePath("/dashboard/feed");
 }

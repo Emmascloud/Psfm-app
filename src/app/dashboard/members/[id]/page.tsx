@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import HomeLink from "@/components/HomeLink";
 import Avatar from "@/components/Avatar";
 import { monthName, ordinal, type Profile, type Post, type Comment } from "@/lib/types";
-import PostForm from "./PostForm";
-import PostCard from "./PostCard";
+import PostForm from "@/components/posts/PostForm";
+import PostCard from "@/components/posts/PostCard";
 
 export default async function MemberProfilePage({
   params,
@@ -59,59 +58,54 @@ export default async function MemberProfilePage({
   const isOwnProfile = user?.id === id;
 
   return (
-    <main className="min-h-screen bg-ink px-6 py-16">
-      <div className="mx-auto max-w-xl">
-        <div className="flex items-center justify-between mb-8">
-          <HomeLink />
-          <Link href="/dashboard/members" className="font-data text-sm text-sage hover:text-cream">
-            ← All members
-          </Link>
+    <div className="px-6 py-8 lg:px-10 lg:py-10 max-w-2xl">
+      <Link href="/dashboard/members" className="font-data text-sm text-sage hover:text-cream mb-6 inline-block">
+        ← All members
+      </Link>
+
+      <div className="rounded-2xl bg-panel p-8 text-center mb-8">
+        <div className="flex justify-center mb-4">
+          <Avatar url={profile.avatar_url} name={profile.full_name} size={72} />
         </div>
-
-        <div className="rounded-2xl bg-panel p-8 text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Avatar url={profile.avatar_url} name={profile.full_name} size={72} />
-          </div>
-          <h1 className="font-display text-2xl text-cream mb-1">{profile.full_name}</h1>
-          {profile.status && (
-            <p className="font-data text-xs text-marigold uppercase tracking-wide mb-6">
-              {profile.status}
-            </p>
-          )}
-          <div className="text-left space-y-3 mt-6 pt-6 border-t border-hairline">
-            <Row label="Birthday" value={`${ordinal(profile.birth_day)} ${monthName(profile.birth_month)}`} />
-            {profile.anniversary_month && profile.anniversary_day && (
-              <Row
-                label="Anniversary"
-                value={`${ordinal(profile.anniversary_day)} ${monthName(profile.anniversary_month)}`}
-              />
-            )}
-          </div>
-        </div>
-
-        <h2 className="font-display text-xl text-cream mb-4">Timeline</h2>
-        {isOwnProfile && <PostForm profileId={id} />}
-
-        <div className="space-y-4">
-          {(posts ?? []).map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              comments={commentsByPost.get(post.id) ?? []}
-              authorsById={authorsById}
-              profileId={id}
-              currentUserId={user?.id ?? null}
-              isAdmin={!!me?.is_admin}
+        <h1 className="font-display text-2xl text-cream mb-1">{profile.full_name}</h1>
+        {profile.status && (
+          <p className="font-data text-xs text-marigold uppercase tracking-wide mb-6">
+            {profile.status}
+          </p>
+        )}
+        <div className="text-left space-y-3 mt-6 pt-6 border-t border-hairline">
+          <Row label="Birthday" value={`${ordinal(profile.birth_day)} ${monthName(profile.birth_month)}`} />
+          {profile.anniversary_month && profile.anniversary_day && (
+            <Row
+              label="Anniversary"
+              value={`${ordinal(profile.anniversary_day)} ${monthName(profile.anniversary_month)}`}
             />
-          ))}
-          {(posts ?? []).length === 0 && (
-            <p className="font-body text-sage text-sm">
-              {isOwnProfile ? "Nothing here yet — share your first update." : "No posts yet."}
-            </p>
           )}
         </div>
       </div>
-    </main>
+
+      <h2 className="font-display text-xl text-cream mb-4">Timeline</h2>
+      {isOwnProfile && <PostForm profileId={id} />}
+
+      <div className="space-y-4">
+        {(posts ?? []).map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            comments={commentsByPost.get(post.id) ?? []}
+            authorsById={authorsById}
+            profileId={id}
+            currentUserId={user?.id ?? null}
+            isAdmin={!!me?.is_admin}
+          />
+        ))}
+        {(posts ?? []).length === 0 && (
+          <p className="font-body text-sage text-sm">
+            {isOwnProfile ? "Nothing here yet — share your first update." : "No posts yet."}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 

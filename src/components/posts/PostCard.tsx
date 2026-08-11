@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Avatar from "@/components/Avatar";
-import { deletePost, deleteComment, createComment, reportContent } from "./actions";
+import { deletePost, deleteComment, createComment, reportContent } from "@/lib/posts/actions";
 import type { Comment } from "@/lib/types";
 
 type Author = { id: string; full_name: string; avatar_url: string | null };

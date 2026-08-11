@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { adminDeletePost, adminDeleteComment, dismissReport } from "./actions";
+import { adminDeletePost, adminDeleteComment, adminDeleteMessage, dismissReport } from "./actions";
 
 export default function ReportRow({
   reportId,
@@ -9,7 +9,7 @@ export default function ReportRow({
   targetId,
 }: {
   reportId: string;
-  targetType: "post" | "comment";
+  targetType: "post" | "comment" | "message";
   targetId: string;
 }) {
   const [pending, startTransition] = useTransition();
@@ -21,7 +21,8 @@ export default function ReportRow({
         onClick={() =>
           startTransition(() => {
             if (targetType === "post") adminDeletePost(targetId);
-            else adminDeleteComment(targetId);
+            else if (targetType === "comment") adminDeleteComment(targetId);
+            else adminDeleteMessage(targetId);
           })
         }
         className="font-data text-xs rounded-full px-3 py-1 border border-ember text-ember hover:bg-ember hover:text-ink transition-colors disabled:opacity-50"

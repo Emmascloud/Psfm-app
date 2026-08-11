@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import HomeLink from "@/components/HomeLink";
+import AppShell from "@/components/AppShell";
 import { monthName, ordinal, type Profile } from "@/lib/types";
 import SuspendButton from "./SuspendButton";
 import ReportRow from "./ReportRow";
@@ -54,36 +53,32 @@ export default async function AdminPage() {
   const commentIds = (reports ?? [])
     .filter((r) => r.target_type === "comment")
     .map((r) => r.target_id);
+  const messageIds = (reports ?? [])
+    .filter((r) => r.target_type === "message")
+    .map((r) => r.target_id);
 
-  const [{ data: reportedPosts }, { data: reportedComments }] = await Promise.all([
-    postIds.length
-      ? supabase.from("posts").select("*").in("id", postIds)
-      : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
-    commentIds.length
-      ? supabase.from("comments").select("*").in("id", commentIds)
-      : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
-  ]);
+  const [{ data: reportedPosts }, { data: reportedComments }, { data: reportedMessages }] =
+    await Promise.all([
+      postIds.length
+        ? supabase.from("posts").select("*").in("id", postIds)
+        : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
+      commentIds.length
+        ? supabase.from("comments").select("*").in("id", commentIds)
+        : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
+      messageIds.length
+        ? supabase.from("messages").select("*").in("id", messageIds)
+        : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
+    ]);
 
   const postById = new Map((reportedPosts ?? []).map((p) => [p.id, p]));
   const commentById = new Map((reportedComments ?? []).map((c) => [c.id, c]));
+  const messageById = new Map((reportedMessages ?? []).map((m) => [m.id, m]));
   const nameById = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
 
   return (
-    <main className="min-h-screen bg-ink">
-      <div className="mx-auto max-w-4xl px-6 py-10">
-        <header className="flex items-center justify-between mb-10">
-          <span className="font-display text-lg text-cream">
-            PSFM <span className="text-marigold">Family</span>{" "}
-            <span className="font-data text-xs text-ember align-middle ml-2">ADMIN</span>
-          </span>
-          <Link href="/dashboard" className="font-data text-sm text-sage hover:text-cream">
-            Back to Family
-          </Link>
-        </header>
-        <div className="mb-6">
-          <HomeLink />
-        </div>
-
+    <AppShell user={{ name: profiles?.find((p) => p.id === user.id)?.full_name ?? "Admin", avatarUrl: profiles?.find((p) => p.id === user.id)?.avatar_url ?? null, isAdmin: true }}>
+      <div className="px-6 py-8 lg:px-10 lg:py-10 max-w-5xl">
+        <p className="font-data text-xs text-ember uppercase tracking-widest mb-2">Admin</p>
         <h1 className="font-display text-2xl text-cream mb-1">Members</h1>
         <p className="font-body text-sm text-sage mb-6">
           {profiles?.length ?? 0} members · visible here so you can reach out
@@ -149,7 +144,11 @@ export default async function AdminPage() {
             <div className="space-y-3">
               {reports?.map((r) => {
                 const content =
-                  r.target_type === "post" ? postById.get(r.target_id) : commentById.get(r.target_id);
+                  r.target_type === "post"
+                    ? postById.get(r.target_id)
+                    : r.target_type === "comment"
+                      ? commentById.get(r.target_id)
+                      : messageById.get(r.target_id);
                 if (!content) return null;
                 return (
                   <div key={r.id} className="rounded-xl bg-panel p-4 flex items-start justify-between gap-4">
@@ -170,6 +169,6 @@ export default async function AdminPage() {
           </div>
         )}
       </div>
-    </main>
+    </AppShell>
   );
 }

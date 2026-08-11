@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { createPost } from "./actions";
+import { createPost } from "@/lib/posts/actions";
 
 export default function PostForm({ profileId }: { profileId: string }) {
   const [body, setBody] = useState("");
