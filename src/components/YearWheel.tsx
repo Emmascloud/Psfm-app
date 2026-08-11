@@ -59,7 +59,7 @@ export default function YearWheel({ profiles }: { profiles: Profile[] }) {
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         className="w-full max-w-[560px] h-auto"
         role="img"
-        aria-label="Wheel of the fellowship's birthdays and anniversaries through the year"
+        aria-label="Wheel of the family's birthdays and anniversaries through the year"
       >
         {/* base ring */}
         <circle

@@ -18,7 +18,7 @@ export default async function MembersPage() {
         <div className="flex items-center justify-between mb-4">
           <HomeLink />
           <Link href="/dashboard" className="font-data text-sm text-sage hover:text-cream">
-            ← Back to the Circle
+            ← Back to the Family
           </Link>
         </div>
         <h1 className="font-display text-3xl text-cream mt-4 mb-8">Members</h1>

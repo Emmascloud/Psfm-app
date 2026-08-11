@@ -15,13 +15,13 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-sm">
       <Link href="/" className="font-display text-lg text-cream block mb-10 text-center">
-        PSFM <span className="text-marigold">Circle</span>
+        PSFM <span className="text-marigold">Family</span>
       </Link>
 
       <div className="rounded-2xl bg-paper p-8">
         <h1 className="font-display text-2xl text-ink-on-paper mb-1">Welcome back</h1>
         <p className="font-body text-sm text-ink-on-paper/60 mb-6">
-          Sign in to see the circle.
+          Sign in to see the family.
         </p>
         {suspended && (
           <p className="font-body text-sm text-ember bg-ember/10 rounded-lg px-3 py-2 mb-4">
@@ -71,7 +71,7 @@ export default function LoginForm() {
       </div>
 
       <p className="font-body text-sm text-sage text-center mt-6">
-        New to the circle?{" "}
+        New to the family?{" "}
         <Link href="/signup" className="text-marigold hover:underline">
           Create an account
         </Link>

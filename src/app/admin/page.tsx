@@ -73,11 +73,11 @@ export default async function AdminPage() {
       <div className="mx-auto max-w-4xl px-6 py-10">
         <header className="flex items-center justify-between mb-10">
           <span className="font-display text-lg text-cream">
-            PSFM <span className="text-marigold">Circle</span>{" "}
+            PSFM <span className="text-marigold">Family</span>{" "}
             <span className="font-data text-xs text-ember align-middle ml-2">ADMIN</span>
           </span>
           <Link href="/dashboard" className="font-data text-sm text-sage hover:text-cream">
-            Back to Circle
+            Back to Family
           </Link>
         </header>
         <div className="mb-6">

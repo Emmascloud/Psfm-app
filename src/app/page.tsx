@@ -8,7 +8,7 @@ export default function Home() {
       <div className="mx-auto max-w-5xl px-6 py-16 md:py-24">
         <header className="flex items-center justify-between mb-20">
           <span className="font-display text-lg tracking-wide text-cream">
-            PSFM <span className="text-marigold">Circle</span>
+            PSFM <span className="text-marigold">Family</span>
           </span>
           <nav className="flex items-center gap-6 font-data text-sm">
             <Link href="/rules" className="text-sage hover:text-cream transition-colors hidden sm:inline">
@@ -21,7 +21,7 @@ export default function Home() {
               href="/signup"
               className="rounded-full bg-marigold px-4 py-2 text-ink-on-paper font-medium hover:bg-marigold-soft transition-colors"
             >
-              Join the circle
+              Join the family
             </Link>
           </nav>
         </header>
@@ -29,16 +29,17 @@ export default function Home() {
         <section className="grid md:grid-cols-[1.2fr_0.8fr] gap-16 items-center">
           <div>
             <p className="font-data text-sm text-marigold mb-4 tracking-widest uppercase">
-              Peculiar Singles &amp; Married
+              Peculiar Single &amp; Married Forum
             </p>
             <h1 className="font-display text-5xl md:text-6xl leading-[1.05] text-cream mb-6">
               Kept, and keeping
               <br /> each other.
             </h1>
             <p className="font-body text-lg text-sage max-w-md mb-6 leading-relaxed">
-              A relationship platform of over 1,000 members, built around one
-              WhatsApp community — where no one's birthday or anniversary
-              gets lost in the group chat.
+              A relationship platform of over 1,000 members — singles and
+              married, together — built around one WhatsApp community to
+              learn and talk about relationships, and to never lose track of
+              a birthday or anniversary in the group chat.
             </p>
             <div className="flex items-center gap-4 flex-wrap">
               <Link
@@ -67,7 +68,7 @@ export default function Home() {
           <DecorativeRing />
         </section>
 
-        <section className="grid sm:grid-cols-3 gap-6 mt-24 pt-16 border-t border-hairline">
+        <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-24 pt-16 border-t border-hairline">
           <Feature
             eyebrow="01"
             title="Keep your own dates"
@@ -80,8 +81,13 @@ export default function Home() {
           />
           <Feature
             eyebrow="03"
+            title="Share on your timeline"
+            body="Post updates and photos to your own profile. Other members can view and comment — moderated, never a free-for-all."
+          />
+          <Feature
+            eyebrow="04"
             title="Only for members"
-            body="Dates are visible to signed-in members only — never public, never searchable."
+            body="Dates, posts, and photos are visible to signed-in members only — never public, never searchable."
           />
         </section>
 

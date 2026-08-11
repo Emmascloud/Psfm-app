@@ -13,7 +13,7 @@ export default function RulesPage() {
     <main className="min-h-screen bg-ink">
       <div className="mx-auto max-w-2xl px-6 py-16">
         <Link href="/" className="font-display text-lg text-cream block mb-10">
-          PSFM <span className="text-marigold">Circle</span>
+          PSFM <span className="text-marigold">Family</span>
         </Link>
 
         <p className="font-data text-sm text-marigold mb-3 tracking-widest uppercase">

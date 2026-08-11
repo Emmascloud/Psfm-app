@@ -1,9 +1,11 @@
-# PSFM Circle
+# PSFM Family
 
-A members-only relationship-platform companion site for Peculiar Singles
-and Married. Sign in, keep your own dates and photo current, post to your
-timeline, browse the group rules, and (for admins) moderate members and
-reported content. Built with Next.js (App Router) + Supabase.
+PSFM — Peculiar Single and Married Forum — is a relationship platform
+where singles and married members come together to learn and talk about
+relationships. This is its members-only companion site: sign in, keep
+your own dates and photo current, post to your timeline, browse the
+group rules, and (for admins) moderate members and reported content.
+Built with Next.js (App Router) + Supabase.
 
 ## 1. Database setup — run these in order
 

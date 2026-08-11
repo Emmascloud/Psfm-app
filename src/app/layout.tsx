@@ -21,9 +21,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PSFM Circle — Peculiar Singles and Married",
+  title: "PSFM Family — Peculiar Single and Married Forum",
   description:
-    "The member circle for Peculiar Singles and Married: keep your profile current and never miss a birthday or anniversary in the fellowship.",
+    "PSFM: a relationship platform where singles and married members come together to learn and talk about relationships — keep your profile current and never miss a birthday or anniversary in the family.",
 };
 
 export default function RootLayout({

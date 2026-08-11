@@ -14,11 +14,11 @@ export default function SignupPage() {
     <main className="min-h-screen bg-ink flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-md">
         <Link href="/" className="font-display text-lg text-cream block mb-10 text-center">
-          PSFM <span className="text-marigold">Circle</span>
+          PSFM <span className="text-marigold">Family</span>
         </Link>
 
         <div className="rounded-2xl bg-paper p-8">
-          <h1 className="font-display text-2xl text-ink-on-paper mb-1">Join the circle</h1>
+          <h1 className="font-display text-2xl text-ink-on-paper mb-1">Join the family</h1>
           <p className="font-body text-sm text-ink-on-paper/60 mb-6">
             Your dates are only ever visible to signed-in members.
           </p>

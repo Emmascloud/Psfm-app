@@ -30,7 +30,7 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-5xl px-6 py-10">
         <header className="flex items-center justify-between mb-12">
           <span className="font-display text-lg text-cream">
-            PSFM <span className="text-marigold">Circle</span>
+            PSFM <span className="text-marigold">Family</span>
           </span>
           <nav className="flex items-center gap-5 font-data text-sm">
             <HomeLink />

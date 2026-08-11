@@ -27,12 +27,12 @@ export default async function ProfilePage() {
           </Link>
         </div>
         <Link href="/dashboard" className="font-display text-lg text-cream block mb-10 text-center">
-          PSFM <span className="text-marigold">Circle</span>
+          PSFM <span className="text-marigold">Family</span>
         </Link>
         <div className="rounded-2xl bg-paper p-8">
           <h1 className="font-display text-2xl text-ink-on-paper mb-1">Your dates</h1>
           <p className="font-body text-sm text-ink-on-paper/60 mb-6">
-            Only you can change this. It updates instantly for the circle.
+            Only you can change this. It updates instantly for the family.
           </p>
           {user && (
             <div className="mb-6 pb-6 border-b border-paper-dim">
