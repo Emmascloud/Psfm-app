@@ -8,6 +8,20 @@ import type { Message } from "@/lib/types";
 
 type Author = { id: string; full_name: string; avatar_url: string | null };
 
+function timeOf(iso: string) {
+  return new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+
+function dayLabel(iso: string) {
+  const d = new Date(iso);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return "Today";
+  if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
+  return d.toLocaleDateString(undefined, { month: "long", day: "numeric" });
+}
+
 export default function ChatRoom({
   initialMessages,
   authorsById,
@@ -65,61 +79,102 @@ export default function ChatRoom({
     });
   }
 
+  let lastDay = "";
+  let lastAuthor = "";
+
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)]">
-      <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+    <div className="flex flex-col h-[calc(100vh-11rem)] lg:h-[calc(100vh-9rem)] rounded-2xl bg-panel overflow-hidden">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
         {messages.map((m) => {
           const author = authorsById[m.author_id];
           const mine = m.author_id === currentUserId;
           const canDelete = mine || isAdmin;
           const reported = reportedIds.has(m.id);
+
+          const day = dayLabel(m.created_at);
+          const showDayDivider = day !== lastDay;
+          lastDay = day;
+          const groupedWithPrev = !showDayDivider && lastAuthor === m.author_id;
+          lastAuthor = m.author_id;
+
           return (
-            <div key={m.id} className={`flex gap-2 ${mine ? "flex-row-reverse" : ""}`}>
-              <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={28} />
-              <div className={`max-w-[75%] ${mine ? "items-end" : "items-start"} flex flex-col`}>
-                <p className="font-data text-[10px] text-sage mb-0.5">
-                  {author?.full_name ?? "Member"}
-                </p>
-                <div
-                  className={`rounded-2xl px-3 py-2 ${
-                    mine ? "bg-marigold text-ink-on-paper" : "bg-panel text-cream"
-                  }`}
-                >
-                  <p className="font-body text-sm whitespace-pre-wrap">{m.body}</p>
+            <div key={m.id}>
+              {showDayDivider && (
+                <div className="flex items-center justify-center my-4">
+                  <span className="font-data text-[10px] text-sage bg-ink-soft rounded-full px-3 py-1">
+                    {day}
+                  </span>
                 </div>
-                <div className="flex gap-2 mt-0.5">
-                  {!reported && !mine && (
-                    <button
-                      onClick={() => {
-                        reportMessage(m.id);
-                        setReportedIds((prev) => new Set(prev).add(m.id));
-                      }}
-                      className="font-data text-[10px] text-sage hover:text-ember transition-colors"
-                    >
-                      Report
-                    </button>
+              )}
+              <div className={`group flex gap-2 ${mine ? "flex-row-reverse" : ""} ${groupedWithPrev ? "mt-0.5" : "mt-3"}`}>
+                <div className="w-7 shrink-0">
+                  {!groupedWithPrev && (
+                    <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={28} />
                   )}
-                  {canDelete && (
-                    <button
-                      onClick={() => deleteMessage(m.id)}
-                      className="font-data text-[10px] text-sage hover:text-ember transition-colors"
-                    >
-                      Delete
-                    </button>
+                </div>
+                <div className={`max-w-[75%] flex flex-col ${mine ? "items-end" : "items-start"}`}>
+                  {!groupedWithPrev && (
+                    <p className="font-data text-[10px] text-sage mb-0.5 px-1">
+                      {author?.full_name ?? "Member"}
+                    </p>
                   )}
+                  <div className="flex items-end gap-1.5">
+                    {mine && (
+                      <span className="font-data text-[9px] text-sage/0 group-hover:text-sage/70 transition-colors whitespace-nowrap pb-1">
+                        {timeOf(m.created_at)}
+                      </span>
+                    )}
+                    <div
+                      className={`rounded-2xl px-3.5 py-2 ${
+                        mine
+                          ? "bg-marigold text-ink-on-paper rounded-br-sm"
+                          : "bg-panel-raised text-cream rounded-bl-sm"
+                      }`}
+                    >
+                      <p className="font-body text-sm whitespace-pre-wrap break-words">{m.body}</p>
+                    </div>
+                    {!mine && (
+                      <span className="font-data text-[9px] text-sage/0 group-hover:text-sage/70 transition-colors whitespace-nowrap pb-1">
+                        {timeOf(m.created_at)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-0.5 px-1">
+                    {!reported && !mine && (
+                      <button
+                        onClick={() => {
+                          reportMessage(m.id);
+                          setReportedIds((prev) => new Set(prev).add(m.id));
+                        }}
+                        className="font-data text-[9px] text-sage/60 hover:text-ember transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        Report
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => deleteMessage(m.id)}
+                        className="font-data text-[9px] text-sage/60 hover:text-ember transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
         {messages.length === 0 && (
-          <p className="font-body text-sage text-sm">No messages yet — say hello.</p>
+          <p className="font-body text-sage text-sm text-center mt-10">
+            No messages yet — say hello 👋
+          </p>
         )}
         <div ref={bottomRef} />
       </div>
 
       {currentUserId && (
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-hairline">
+        <div className="flex items-center gap-2 px-4 py-3 border-t border-hairline bg-ink-soft">
           <input
             value={body}
             onChange={(e) => setBody(e.target.value)}
@@ -132,9 +187,12 @@ export default function ChatRoom({
           <button
             disabled={pending || !body.trim()}
             onClick={submit}
-            className="rounded-full bg-marigold px-5 py-2.5 font-data text-xs font-medium text-ink-on-paper hover:bg-marigold-soft transition-colors disabled:opacity-50"
+            aria-label="Send"
+            className="rounded-full bg-marigold w-10 h-10 flex items-center justify-center text-ink-on-paper hover:bg-marigold-soft transition-colors disabled:opacity-50 shrink-0"
           >
-            Send
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8h11M8 2l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
         </div>
       )}

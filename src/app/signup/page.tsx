@@ -14,7 +14,7 @@ export default function SignupPage() {
     <main className="min-h-screen bg-ink flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-md">
         <Link href="/" className="font-display text-lg text-cream block mb-10 text-center">
-          PSFM <span className="text-marigold">Family</span>
+          PSMF <span className="text-marigold">Family</span>
         </Link>
 
         <div className="rounded-2xl bg-paper p-8">

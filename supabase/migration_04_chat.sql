@@ -1,4 +1,4 @@
--- PSFM Family — migration 04: family chat room
+-- PSMF Family — migration 04: family chat room
 -- Paste and run each numbered section separately.
 
 -- 1) Messages table

@@ -1,4 +1,4 @@
--- PSFM Circle — profiles schema
+-- PSMF Circle — profiles schema
 -- Run this once in your Supabase project: Dashboard → SQL Editor → New query → paste → Run.
 
 create table if not exists public.profiles (

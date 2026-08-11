@@ -23,6 +23,16 @@ export type Post = {
   body: string;
   image_url: string | null;
   reported: boolean;
+  edited_at: string | null;
+  created_at: string;
+};
+
+export type Reaction = {
+  id: string;
+  target_type: "post";
+  target_id: string;
+  user_id: string;
+  emoji: string;
   created_at: string;
 };
 

@@ -1,4 +1,4 @@
--- PSFM Circle — migration 03: profile pictures, timeline posts, comments,
+-- PSMF Circle — migration 03: profile pictures, timeline posts, comments,
 -- and reporting. Run each numbered block separately in the SQL Editor
 -- (paste one, Run, clear, paste the next) to avoid comment/paste issues.
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -81,8 +82,9 @@ export default async function AdminPage() {
         <p className="font-data text-xs text-ember uppercase tracking-widest mb-2">Admin</p>
         <h1 className="font-display text-2xl text-cream mb-1">Members</h1>
         <p className="font-body text-sm text-sage mb-6">
-          {profiles?.length ?? 0} members · visible here so you can reach out
-          for birthdays/anniversaries and moderate accounts.
+          {profiles?.length ?? 0} members · click a name for their full profile
+          and timeline · reach out for birthdays/anniversaries and moderate
+          accounts here.
         </p>
 
         {emailLookupFailed && (
@@ -108,7 +110,12 @@ export default async function AdminPage() {
               {profiles?.map((p) => (
                 <tr key={p.id} className="border-b border-hairline last:border-0">
                   <td className="font-body text-cream px-4 py-3">
-                    {p.full_name}
+                    <Link
+                      href={`/dashboard/members/${p.id}`}
+                      className="hover:text-marigold transition-colors"
+                    >
+                      {p.full_name}
+                    </Link>
                     {p.is_admin && (
                       <span className="ml-2 font-data text-[10px] text-marigold">ADMIN</span>
                     )}

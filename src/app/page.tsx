@@ -8,7 +8,7 @@ export default function Home() {
       <div className="mx-auto max-w-5xl px-6 py-16 md:py-24">
         <header className="flex items-center justify-between mb-20">
           <span className="font-display text-lg tracking-wide text-cream">
-            PSFM <span className="text-marigold">Family</span>
+            PSMF <span className="text-marigold">Family</span>
           </span>
           <nav className="flex items-center gap-6 font-data text-sm">
             <Link href="/rules" className="text-sage hover:text-cream transition-colors hidden sm:inline">

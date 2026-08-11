@@ -1,6 +1,6 @@
-# PSFM Family
+# PSMF Family
 
-PSFM — Peculiar Single and Married Forum — is a relationship platform
+PSMF — Peculiar Single and Married Forum — is a relationship platform
 where singles and married members come together to learn and talk about
 relationships. This is its members-only companion site: sign in, keep
 your own dates and photo current, post to a shared feed or your own

@@ -1,4 +1,4 @@
--- PSFM Circle — migration 02: admin + moderation
+-- PSMF Circle — migration 02: admin + moderation
 -- Run in Supabase SQL Editor after schema.sql.
 
 alter table public.profiles

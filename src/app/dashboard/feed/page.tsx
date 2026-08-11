@@ -18,14 +18,28 @@ export default async function FeedPage() {
   ]);
 
   const postIds = (posts ?? []).map((p) => p.id);
-  const { data: comments } = postIds.length
-    ? await supabase
-        .from("comments")
-        .select("*")
-        .in("post_id", postIds)
-        .order("created_at", { ascending: true })
-        .returns<Comment[]>()
-    : { data: [] as Comment[] };
+  const [{ data: comments }, { data: reactions }] = await Promise.all([
+    postIds.length
+      ? supabase
+          .from("comments")
+          .select("*")
+          .in("post_id", postIds)
+          .order("created_at", { ascending: true })
+          .returns<Comment[]>()
+      : Promise.resolve({ data: [] as Comment[] }),
+    postIds.length
+      ? supabase.from("reactions").select("*").eq("target_type", "post").in("target_id", postIds)
+      : Promise.resolve({ data: [] as { target_id: string; user_id: string; emoji: string }[] }),
+  ]);
+
+  const reactionCountsByPost = new Map<string, Record<string, number>>();
+  const myReactionByPost = new Map<string, string>();
+  for (const r of reactions ?? []) {
+    const counts = reactionCountsByPost.get(r.target_id) ?? {};
+    counts[r.emoji] = (counts[r.emoji] ?? 0) + 1;
+    reactionCountsByPost.set(r.target_id, counts);
+    if (r.user_id === user?.id) myReactionByPost.set(r.target_id, r.emoji);
+  }
 
   const authorsById = new Map((allProfiles ?? []).map((p) => [p.id, p]));
   const commentsByPost = new Map<string, Comment[]>();
@@ -52,6 +66,8 @@ export default async function FeedPage() {
             profileId={post.author_id}
             currentUserId={user?.id ?? null}
             isAdmin={!!me?.is_admin}
+            reactionCounts={reactionCountsByPost.get(post.id)}
+            myReaction={myReactionByPost.get(post.id)}
           />
         ))}
         {(posts ?? []).length === 0 && (

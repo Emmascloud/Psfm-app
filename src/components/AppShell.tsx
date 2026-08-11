@@ -32,7 +32,7 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 border-r border-hairline px-6 py-8">
         <Link href="/" className="font-display text-lg text-cream mb-10 block">
-          PSFM <span className="text-marigold">Family</span>
+          PSMF <span className="text-marigold">Family</span>
         </Link>
         <nav className="flex flex-col gap-1 flex-1">
           {allLinks.map((l) => (
@@ -65,7 +65,7 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-20 bg-ink/95 backdrop-blur border-b border-hairline px-4 py-3 flex items-center justify-between">
         <Link href="/" className="font-display text-lg text-cream">
-          PSFM <span className="text-marigold">Family</span>
+          PSMF <span className="text-marigold">Family</span>
         </Link>
         <button
           onClick={() => setOpen(!open)}
