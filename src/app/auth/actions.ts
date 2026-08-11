@@ -1,10 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionState = { error: string | null };
+export type ForgotPasswordState = { error: string | null; sent: boolean };
 
 export async function signUp(
   _prev: ActionState,
@@ -22,6 +24,7 @@ export async function signUp(
   const anniversaryDay = formData.get("anniversary_day")
     ? Number(formData.get("anniversary_day"))
     : null;
+  const phone = String(formData.get("phone") || "").trim() || null;
 
   if (!email || !password || !fullName || !birthMonth || !birthDay) {
     return { error: "Please fill in your name, birthday, email and password." };
@@ -44,6 +47,10 @@ export async function signUp(
   });
 
   if (profileError) return { error: profileError.message };
+
+  if (phone) {
+    await supabase.from("contacts").insert({ id: data.user.id, phone });
+  }
 
   redirect("/dashboard");
 }
@@ -89,6 +96,7 @@ export async function updateProfile(
   const anniversaryDay = formData.get("anniversary_day")
     ? Number(formData.get("anniversary_day"))
     : null;
+  const phone = String(formData.get("phone") || "").trim() || null;
 
   if (!fullName || !birthMonth || !birthDay) {
     return { error: "Name and birthday are required." };
@@ -107,6 +115,8 @@ export async function updateProfile(
     .eq("id", user.id);
 
   if (error) return { error: error.message };
+
+  await supabase.from("contacts").upsert({ id: user.id, phone });
 
   revalidatePath("/dashboard");
   redirect("/dashboard");
@@ -134,6 +144,44 @@ export async function toggleSuspension(userId: string, suspend: boolean) {
   if (error) return { error: error.message };
   revalidatePath("/admin");
   return { error: null };
+}
+
+export async function requestPasswordReset(
+  _prev: ForgotPasswordState,
+  formData: FormData,
+): Promise<ForgotPasswordState> {
+  const email = String(formData.get("email") || "").trim();
+  if (!email) return { error: "Enter your email.", sent: false };
+
+  const supabase = await createClient();
+  const headersList = await headers();
+  const host = headersList.get("host");
+  const protocol = host?.startsWith("localhost") ? "http" : "https";
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${protocol}://${host}/auth/callback?next=/reset-password`,
+  });
+
+  // Always report success, whether or not that email has an account —
+  // this avoids letting the form be used to check who's a member.
+  return { error: null, sent: true };
+}
+
+export async function updatePassword(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const password = String(formData.get("password") || "");
+  const confirm = String(formData.get("confirm") || "");
+
+  if (password.length < 6) return { error: "Password must be at least 6 characters." };
+  if (password !== confirm) return { error: "Passwords don't match." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+
+  redirect("/dashboard");
 }
 
 export async function updateAvatar(url: string) {

@@ -52,6 +52,12 @@ export type Message = {
   created_at: string;
 };
 
+export type Contact = {
+  id: string;
+  phone: string | null;
+  updated_at: string;
+};
+
 // Days from Jan 1 for a given month/day, used to place points on the wheel.
 // Uses a non-leap reference year since we never store birth years.
 export function dayOfYear(month: number, day: number): number {

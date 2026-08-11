@@ -27,6 +27,9 @@ export default async function AdminPage() {
     .order("full_name")
     .returns<Profile[]>();
 
+  const { data: contacts } = await supabase.from("contacts").select("*");
+  const phoneById = new Map((contacts ?? []).map((c) => [c.id, c.phone]));
+
   // Emails live in auth.users, not the public profiles table — fetched
   // here with the service-role key, server-side only, admin-gated above.
   // If the key isn't configured yet, degrade gracefully instead of
@@ -101,6 +104,7 @@ export default async function AdminPage() {
               <tr className="border-b border-hairline">
                 <th className="font-data text-xs text-sage uppercase px-4 py-3">Name</th>
                 <th className="font-data text-xs text-sage uppercase px-4 py-3">Email</th>
+                <th className="font-data text-xs text-sage uppercase px-4 py-3">Phone</th>
                 <th className="font-data text-xs text-sage uppercase px-4 py-3">Birthday</th>
                 <th className="font-data text-xs text-sage uppercase px-4 py-3">Status</th>
                 <th className="font-data text-xs text-sage uppercase px-4 py-3"></th>
@@ -122,6 +126,9 @@ export default async function AdminPage() {
                   </td>
                   <td className="font-body text-sage text-sm px-4 py-3">
                     {emailById.get(p.id) ?? "—"}
+                  </td>
+                  <td className="font-body text-sage text-sm px-4 py-3">
+                    {phoneById.get(p.id) || "—"}
                   </td>
                   <td className="font-data text-sm text-cream px-4 py-3">
                     {ordinal(p.birth_day)} {monthName(p.birth_month).slice(0, 3)}

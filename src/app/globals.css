@@ -1,28 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  /* Ink — deep botanical teal, the family's base tone */
-  --ink: #14261F;
-  --ink-soft: #1C332B;
-  --panel: #1F3B33;
-  --panel-raised: #274A40;
-  --hairline: rgba(243, 236, 219, 0.12);
+  /* Ink — deep aubergine, the family's base tone: warm, night-time, romantic */
+  --ink: #241726;
+  --ink-soft: #2E1D31;
+  --panel: #3A2440;
+  --panel-raised: #4B2E52;
+  --hairline: rgba(247, 237, 230, 0.12);
 
-  /* Paper — warm parchment used only for light surfaces (cards, forms) */
-  --paper: #FBF7EE;
-  --paper-dim: #EFE8D6;
-  --ink-on-paper: #1C2E27;
+  /* Paper — warm blush used only for light surfaces (cards, forms) */
+  --paper: #FCF3EF;
+  --paper-dim: #F1DFD6;
+  --ink-on-paper: #2E1D31;
 
-  /* Accents — candle marigold (primary), coral ember (sparing) */
-  --marigold: #E8A33D;
-  --marigold-soft: #F3C879;
-  --ember: #E8663D;
-  --sage: #9FBFA9;
-  --cream: #F5EFDD;
+  /* Accents — rose (primary), berry (sparing/alerts), mauve (secondary text) */
+  --marigold: #E88C74;
+  --marigold-soft: #F0AC98;
+  --ember: #C6486B;
+  --sage: #C9A6C4;
+  --cream: #F8ECE5;
 
   --font-display: var(--font-fraunces);
-  --font-body: var(--font-plex-sans);
-  --font-mono: var(--font-plex-mono);
+  --font-body: var(--font-inter);
 }
 
 @theme inline {
@@ -40,7 +39,6 @@
   --color-cream: var(--cream);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
-  --font-mono: var(--font-mono);
 }
 
 * {
@@ -53,6 +51,7 @@ html {
 
 body {
   background: var(--ink);
+  background-image: radial-gradient(ellipse 900px 500px at 15% -10%, rgba(232, 140, 116, 0.12), transparent);
   color: var(--cream);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
@@ -61,8 +60,13 @@ body {
   font-family: var(--font-display), Georgia, serif;
 }
 
+/* UI labels, nav, buttons, timestamps — body font, tracked + small,
+   not a monospace/code face. This is the one place that used to look
+   "technical"; changing it here re-themes the whole app. */
 .font-data {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  font-weight: 500;
 }
 
 ::selection {
@@ -74,6 +78,20 @@ body {
   outline: 2px solid var(--marigold);
   outline-offset: 3px;
   border-radius: 2px;
+}
+
+/* Discourage casual copying of member content. Not real security —
+   view-source and dev tools still work — but it stops the common
+   long-press/select-all/right-click path. See note to the person about
+   what this can and can't actually do. */
+.no-copy {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.no-copy input,
+.no-copy textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 @media (prefers-reduced-motion: reduce) {
