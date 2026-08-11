@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import Avatar from "@/components/Avatar";
+import ScrollTopButton from "@/components/ScrollTopButton";
 import { monthName, ordinal, type Profile } from "@/lib/types";
 
 export default async function MembersPage() {
@@ -34,6 +35,7 @@ export default async function MembersPage() {
           </li>
         ))}
       </ul>
+      <ScrollTopButton />
     </div>
   );
 }

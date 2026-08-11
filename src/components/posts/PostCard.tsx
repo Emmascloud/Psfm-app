@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import ReactionBar from "./ReactionBar";
 import { deletePost, deleteComment, createComment, editPost, reportContent } from "@/lib/posts/actions";
@@ -73,23 +74,30 @@ export default function PostCard({
     <div className="rounded-2xl bg-panel p-4 shadow-sm shadow-black/10">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={30} />
+          <Link href={`/dashboard/members/${post.author_id}`}>
+            <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={30} />
+          </Link>
           <div>
-            <p className="font-body text-sm text-cream">{author?.full_name ?? "Member"}</p>
+            <Link
+              href={`/dashboard/members/${post.author_id}`}
+              className="font-body text-sm text-cream hover:text-marigold transition-colors"
+            >
+              {author?.full_name ?? "Member"}
+            </Link>
             <p className="font-data text-[10px] text-sage">
               {formatTimestamp(post.created_at)}
               {edited && " · edited"}
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-1.5">
           {isMine && !editing && (
             <button
               onClick={() => {
                 setDraft(body);
                 setEditing(true);
               }}
-              className="font-data text-[10px] text-sage hover:text-cream transition-colors"
+              className="font-data text-[11px] text-cream/80 hover:text-cream bg-panel-raised hover:bg-panel-raised/80 rounded-full px-2.5 py-1 transition-colors"
             >
               Edit
             </button>
@@ -102,7 +110,7 @@ export default function PostCard({
                   setReported(true);
                 })
               }
-              className="font-data text-[10px] text-sage hover:text-ember transition-colors"
+              className="font-data text-[11px] text-cream/80 hover:text-ember bg-panel-raised hover:bg-panel-raised/80 rounded-full px-2.5 py-1 transition-colors"
             >
               Report
             </button>
@@ -111,7 +119,7 @@ export default function PostCard({
             <button
               disabled={pending}
               onClick={() => startTransition(() => { deletePost(post.id, profileId); })}
-              className="font-data text-[10px] text-sage hover:text-ember transition-colors"
+              className="font-data text-[11px] text-cream/80 hover:text-ember bg-panel-raised hover:bg-panel-raised/80 rounded-full px-2.5 py-1 transition-colors"
             >
               Delete
             </button>
@@ -170,10 +178,14 @@ export default function PostCard({
             const canDeleteComment = currentUserId === c.author_id || isAdmin;
             return (
               <div key={c.id} className="flex items-start gap-2 mt-2">
-                <Avatar url={cAuthor?.avatar_url} name={cAuthor?.full_name ?? "?"} size={22} />
+                <Link href={`/dashboard/members/${c.author_id}`}>
+                  <Avatar url={cAuthor?.avatar_url} name={cAuthor?.full_name ?? "?"} size={22} />
+                </Link>
                 <div className="flex-1">
                   <p className="font-body text-xs text-cream">
-                    <span className="font-medium">{cAuthor?.full_name ?? "Member"}</span>{" "}
+                    <Link href={`/dashboard/members/${c.author_id}`} className="font-medium hover:text-marigold transition-colors">
+                      {cAuthor?.full_name ?? "Member"}
+                    </Link>{" "}
                     <span className="text-sage">{c.body}</span>
                   </p>
                   <p className="font-data text-[9px] text-sage/70 mt-0.5">

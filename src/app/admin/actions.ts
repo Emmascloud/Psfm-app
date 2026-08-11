@@ -40,6 +40,13 @@ export async function adminDeleteMessage(messageId: string) {
   revalidatePath("/admin");
 }
 
+export async function adminDeleteDM(messageId: string) {
+  const { supabase, ok } = await requireAdmin();
+  if (!ok) return;
+  await supabase.from("direct_messages").delete().eq("id", messageId);
+  revalidatePath("/admin");
+}
+
 export async function dismissReport(reportId: string) {
   const { supabase, ok } = await requireAdmin();
   if (!ok) return;

@@ -45,8 +45,28 @@
   border-color: var(--hairline);
 }
 
+[data-theme="light"] {
+  --ink: #FBF3EF;
+  --ink-soft: #F5E6DE;
+  --panel: #FFFFFF;
+  --panel-raised: #F6E9E2;
+  --hairline: rgba(46, 29, 49, 0.10);
+  --paper: #FFFFFF;
+  --paper-dim: #F1DFD6;
+  --ink-on-paper: #2E1D31;
+  --marigold: #D9714F;
+  --marigold-soft: #E89679;
+  --ember: #B93D5E;
+  --sage: #8B6B86;
+  --cream: #2E1D31;
+}
+
 html {
   color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {

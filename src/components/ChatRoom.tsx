@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { sendMessage, deleteMessage, reportMessage } from "@/lib/chat/actions";
 import Avatar from "@/components/Avatar";
@@ -108,19 +109,24 @@ export default function ChatRoom({
               )}
               <div className={`group flex gap-2 ${mine ? "flex-row-reverse" : ""} ${groupedWithPrev ? "mt-0.5" : "mt-3"}`}>
                 <div className="w-7 shrink-0">
-                  {!groupedWithPrev && (
-                    <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={28} />
+                  {!groupedWithPrev && !mine && (
+                    <Link href={`/dashboard/members/${m.author_id}`}>
+                      <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={28} />
+                    </Link>
                   )}
                 </div>
                 <div className={`max-w-[75%] flex flex-col ${mine ? "items-end" : "items-start"}`}>
-                  {!groupedWithPrev && (
-                    <p className="font-data text-[10px] text-sage mb-0.5 px-1">
+                  {!groupedWithPrev && !mine && (
+                    <Link
+                      href={`/dashboard/members/${m.author_id}`}
+                      className="font-data text-[10px] text-sage hover:text-marigold transition-colors mb-0.5 px-1"
+                    >
                       {author?.full_name ?? "Member"}
-                    </p>
+                    </Link>
                   )}
                   <div className="flex items-end gap-1.5">
                     {mine && (
-                      <span className="font-data text-[9px] text-sage/0 group-hover:text-sage/70 transition-colors whitespace-nowrap pb-1">
+                      <span className="font-data text-[10px] text-sage/70 whitespace-nowrap pb-1">
                         {timeOf(m.created_at)}
                       </span>
                     )}
@@ -134,7 +140,7 @@ export default function ChatRoom({
                       <p className="font-body text-sm whitespace-pre-wrap break-words">{m.body}</p>
                     </div>
                     {!mine && (
-                      <span className="font-data text-[9px] text-sage/0 group-hover:text-sage/70 transition-colors whitespace-nowrap pb-1">
+                      <span className="font-data text-[10px] text-sage/70 whitespace-nowrap pb-1">
                         {timeOf(m.created_at)}
                       </span>
                     )}
@@ -146,7 +152,7 @@ export default function ChatRoom({
                           reportMessage(m.id);
                           setReportedIds((prev) => new Set(prev).add(m.id));
                         }}
-                        className="font-data text-[9px] text-sage/60 hover:text-ember transition-colors opacity-0 group-hover:opacity-100"
+                        className="font-data text-[10px] text-sage/70 hover:text-ember transition-colors"
                       >
                         Report
                       </button>
@@ -154,7 +160,7 @@ export default function ChatRoom({
                     {canDelete && (
                       <button
                         onClick={() => deleteMessage(m.id)}
-                        className="font-data text-[9px] text-sage/60 hover:text-ember transition-colors opacity-0 group-hover:opacity-100"
+                        className="font-data text-[10px] text-sage/70 hover:text-ember transition-colors"
                       >
                         Delete
                       </button>

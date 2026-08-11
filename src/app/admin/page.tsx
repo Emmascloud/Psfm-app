@@ -60,8 +60,9 @@ export default async function AdminPage() {
   const messageIds = (reports ?? [])
     .filter((r) => r.target_type === "message")
     .map((r) => r.target_id);
+  const dmIds = (reports ?? []).filter((r) => r.target_type === "dm").map((r) => r.target_id);
 
-  const [{ data: reportedPosts }, { data: reportedComments }, { data: reportedMessages }] =
+  const [{ data: reportedPosts }, { data: reportedComments }, { data: reportedMessages }, { data: reportedDMs }] =
     await Promise.all([
       postIds.length
         ? supabase.from("posts").select("*").in("id", postIds)
@@ -72,15 +73,21 @@ export default async function AdminPage() {
       messageIds.length
         ? supabase.from("messages").select("*").in("id", messageIds)
         : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
+      dmIds.length
+        ? supabase.from("direct_messages").select("*").in("id", dmIds)
+        : Promise.resolve({ data: [] as { id: string; body: string; sender_id: string }[] }),
     ]);
 
   const postById = new Map((reportedPosts ?? []).map((p) => [p.id, p]));
   const commentById = new Map((reportedComments ?? []).map((c) => [c.id, c]));
   const messageById = new Map((reportedMessages ?? []).map((m) => [m.id, m]));
+  const dmById = new Map(
+    (reportedDMs ?? []).map((m) => [m.id, { body: m.body, author_id: m.sender_id }]),
+  );
   const nameById = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
 
   return (
-    <AppShell user={{ name: profiles?.find((p) => p.id === user.id)?.full_name ?? "Admin", avatarUrl: profiles?.find((p) => p.id === user.id)?.avatar_url ?? null, isAdmin: true }}>
+    <AppShell user={{ id: user.id, name: profiles?.find((p) => p.id === user.id)?.full_name ?? "Admin", avatarUrl: profiles?.find((p) => p.id === user.id)?.avatar_url ?? null, isAdmin: true }}>
       <div className="px-6 py-8 lg:px-10 lg:py-10 max-w-5xl">
         <p className="font-data text-xs text-ember uppercase tracking-widest mb-2">Admin</p>
         <h1 className="font-display text-2xl text-cream mb-1">Members</h1>
@@ -162,7 +169,9 @@ export default async function AdminPage() {
                     ? postById.get(r.target_id)
                     : r.target_type === "comment"
                       ? commentById.get(r.target_id)
-                      : messageById.get(r.target_id);
+                      : r.target_type === "message"
+                        ? messageById.get(r.target_id)
+                        : dmById.get(r.target_id);
                 if (!content) return null;
                 return (
                   <div key={r.id} className="rounded-xl bg-panel p-4 flex items-start justify-between gap-4">

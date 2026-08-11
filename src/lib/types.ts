@@ -58,6 +58,21 @@ export type Contact = {
   updated_at: string;
 };
 
+export type DirectMessage = {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  body: string;
+  read_at: string | null;
+  created_at: string;
+};
+
+export type Follow = {
+  follower_id: string;
+  following_id: string;
+  created_at: string;
+};
+
 // Days from Jan 1 for a given month/day, used to place points on the wheel.
 // Uses a non-leap reference year since we never store birth years.
 export function dayOfYear(month: number, day: number): number {

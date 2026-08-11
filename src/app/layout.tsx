@@ -27,6 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fraunces.variable} ${inter.variable} antialiased no-copy`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{document.documentElement.setAttribute('data-theme', localStorage.getItem('psmf-theme') === 'light' ? 'light' : 'dark');}catch(e){}`,
+          }}
+        />
         <CopyGuard />
         {children}
       </body>

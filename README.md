@@ -7,26 +7,16 @@ Next.js (App Router) + Supabase.
 
 ## 1. Database setup — run in order, each file's sections separately
 
-SQL Editor → New query → paste one numbered section → Run → clear →
-next section.
-
 1. `supabase/schema.sql`
 2. `supabase/migration_02_admin.sql` (2 sections)
 3. `supabase/migration_03_social.sql` (5 sections)
 4. `supabase/migration_04_chat.sql` (3 sections)
 5. `supabase/migration_05_reactions_edits.sql` (2 sections)
-6. `supabase/migration_06_contact.sql` (3 sections) — **new this round**:
-   a private `contacts` table for phone numbers (visible only to the
-   member themselves and to admins — deliberately not a plain column on
-   `profiles`, which everyone can already read).
-
-### Password reset — one setting to check
-
-Supabase → Authentication → URL Configuration: make sure your live
-domain is listed under **Redirect URLs** (e.g.
-`https://your-app.vercel.app/auth/callback`). Without this, the reset
-email's link will be rejected by Supabase before it ever reaches the
-site.
+6. `supabase/migration_06_contact.sql` (3 sections)
+7. `supabase/migration_07_dms.sql` (3 sections)
+8. `supabase/migration_08_follows.sql` (2 sections) — **new this round**:
+   follow/unfollow between members, with live follower/following counts
+   on each profile.
 
 ### Making yourself an admin
 
@@ -37,52 +27,60 @@ update public.profiles set is_admin = true
 
 ## 2. Environment variables
 
-Unchanged — still three:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
-```
+Unchanged — still three: `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## What's new this round
 
-- **Full visual redesign.** New palette — deep aubergine/plum base with
-  a warm rose accent, replacing the teal/marigold theme — plus a new
-  body typeface (Inter, replacing IBM Plex Sans) and de-mono'd UI
-  labels (nav, buttons, timestamps now use a tracked weight of the body
-  font instead of a monospace face, which was reading as "technical"
-  rather than "relationship platform"). Because every color and font in
-  the app is driven from the tokens in `src/app/globals.css`, this
-  reskin touched two files and propagated everywhere — no per-page
-  recoloring.
-- **Copy protection.** Right-click, text selection, and copy/cut are
-  now blocked site-wide (`src/components/CopyGuard.tsx` +
-  `.no-copy` in `globals.css`). Being upfront about what this actually
-  is: it stops casual copying, not determined copying. Anyone can still
-  read the page source, open dev tools, or screenshot it — there's no
-  client-side technique that prevents that. If content theft is a real
-  concern, watermarking images and being selective about what gets
-  posted publicly matters more than this does. It's included because
-  it was asked for, not because it's a strong protection.
-- **Phone number field** — on signup and on `/dashboard/profile`,
-  stored in the new private `contacts` table. Visible to the member
-  themselves and to admins (now a column in `/admin`'s member table),
-  not to other members — same privacy level as email. If you'd rather
-  members could see each other's numbers, that's a policy change in
-  `migration_06_contact.sql`, not a big rebuild — just say so.
-- **Forgot / reset password** — `/forgot-password` sends a reset email;
-  the link routes through `/auth/callback` (which exchanges Supabase's
-  code for a session) and lands on `/reset-password` to set a new one.
-  Linked from the login page.
+- **Bug fix**: Edit/Delete/Report on chat messages had become invisible
+  on phones — I'd made them appear on hover, which doesn't exist on a
+  touchscreen. They're always visible now, in both chat and the feed
+  (which also got slightly bigger, higher-contrast buttons while I was
+  in there).
+- **Private messaging** — any member can message any other member.
+  Start one from a member's profile page (a "Message" button) or from
+  `/dashboard/inbox`. Conversations are two-person only, live via
+  Realtime, and each message can be reported or deleted the same way
+  posts and chat messages can.
+- **Everything now links to profiles** — names and avatars in chat, the
+  feed, and comments are clickable through to that member's profile,
+  where you can also message them.
+- **Notification dots** in the sidebar/nav for Chat, Feed, and Inbox
+  when something new happens while you're elsewhere in the app. This is
+  session-only — it doesn't persist an unread count across page reloads
+  or devices, it just catches you up on what happened while you were on
+  another tab of the site.
+- **Light/dark mode** — toggle button in the sidebar (desktop) or top
+  bar (mobile). Because the whole app is built on the same CSS token
+  system from the last redesign, this took one new set of token values,
+  not per-component work.
+- **Scroll-to-top button** on Feed and Members.
+
+## What's new this round
+
+- **Follow** — a Follow/Following button on every member's profile
+  (not shown on your own), with live follower and following counts.
+  This is the "add as friends / follow" piece from last round — kept
+  one-directional (like X, not a two-sided "friend request" like
+  Facebook) since that's simpler to reason about and needs no
+  accept/decline flow. Say if you'd rather it require mutual
+  acceptance instead.
+
+## Deliberately not in this round
+
+- The feed doesn't yet filter by "people I follow" — it's still
+  everyone's posts, newest first. That's a reasonable next step once
+  follow relationships exist to filter by.
+- A ground-up "make it look exactly like X or Facebook" template swap —
+  still holding off on further big theme changes; small polish and bug
+  fixes are fair game any time.
 
 ## Still true from before
 
-Responsive app shell (sidebar on desktop, drawer on mobile), Feed,
-family chat with Realtime, per-profile timeline with editable posts and
-emoji reactions, admin moderation (suspend + reported-content review,
-now covering messages too), member names in `/admin` link to full
-profiles. The 150+ WhatsApp names still aren't pre-loaded — same two
-options as before (self-serve signup, or a bulk-seed script on
-request). Private member-to-member/admin-to-member messaging is not
-built yet — still a separate feature from everything above.
+Responsive app shell, admin moderation (suspend + reported-content
+review — now covering DMs too), profile photos, editable timeline posts
+with emoji reactions, private phone numbers, forgot/reset password,
+copy protection, group rules page, WhatsApp invite link on the
+homepage. The 150+ WhatsApp names still aren't pre-loaded — same two
+options as always (self-serve signup, or a bulk-seed script on
+request).

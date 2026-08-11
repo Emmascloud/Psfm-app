@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import PostForm from "@/components/posts/PostForm";
 import PostCard from "@/components/posts/PostCard";
+import ScrollTopButton from "@/components/ScrollTopButton";
 import type { Post, Comment } from "@/lib/types";
 
 export default async function FeedPage() {
@@ -76,6 +77,7 @@ export default async function FeedPage() {
           </p>
         )}
       </div>
+      <ScrollTopButton />
     </div>
   );
 }

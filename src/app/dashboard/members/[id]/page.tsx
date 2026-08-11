@@ -5,6 +5,7 @@ import Avatar from "@/components/Avatar";
 import { monthName, ordinal, type Profile, type Post, type Comment } from "@/lib/types";
 import PostForm from "@/components/posts/PostForm";
 import PostCard from "@/components/posts/PostCard";
+import FollowButton from "@/components/FollowButton";
 
 export default async function MemberProfilePage({
   params,
@@ -26,18 +27,23 @@ export default async function MemberProfilePage({
 
   if (!profile) notFound();
 
-  const [{ data: me }, { data: allProfiles }, { data: posts }] = await Promise.all([
-    user
-      ? supabase.from("profiles").select("is_admin").eq("id", user.id).single()
-      : Promise.resolve({ data: null }),
-    supabase.from("profiles").select("id, full_name, avatar_url"),
-    supabase
-      .from("posts")
-      .select("*")
-      .eq("author_id", id)
-      .order("created_at", { ascending: false })
-      .returns<Post[]>(),
-  ]);
+  const [{ data: me }, { data: allProfiles }, { data: posts }, { data: followers }, { data: following }] =
+    await Promise.all([
+      user
+        ? supabase.from("profiles").select("is_admin").eq("id", user.id).single()
+        : Promise.resolve({ data: null }),
+      supabase.from("profiles").select("id, full_name, avatar_url"),
+      supabase
+        .from("posts")
+        .select("*")
+        .eq("author_id", id)
+        .order("created_at", { ascending: false })
+        .returns<Post[]>(),
+      supabase.from("follows").select("follower_id").eq("following_id", id),
+      supabase.from("follows").select("following_id").eq("follower_id", id),
+    ]);
+
+  const isFollowing = !!followers?.some((f) => f.follower_id === user?.id);
 
   const postIds = (posts ?? []).map((p) => p.id);
   const [{ data: comments }, { data: reactions }] = await Promise.all([
@@ -83,9 +89,30 @@ export default async function MemberProfilePage({
         </div>
         <h1 className="font-display text-2xl text-cream mb-1">{profile.full_name}</h1>
         {profile.status && (
-          <p className="font-data text-xs text-marigold uppercase tracking-wide mb-6">
+          <p className="font-data text-xs text-marigold uppercase tracking-wide mb-3">
             {profile.status}
           </p>
+        )}
+
+        <div className="flex items-center justify-center gap-4 mb-4 font-data text-xs text-sage">
+          <span>
+            <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
+          </span>
+          <span>
+            <span className="text-cream font-medium">{following?.length ?? 0}</span> following
+          </span>
+        </div>
+
+        {!isOwnProfile && user && (
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <FollowButton targetId={profile.id} initiallyFollowing={isFollowing} />
+            <Link
+              href={`/dashboard/inbox/${profile.id}`}
+              className="inline-flex items-center gap-1.5 rounded-full bg-panel-raised px-4 py-1.5 font-data text-xs font-medium text-cream hover:bg-panel-raised/70 transition-colors"
+            >
+              Message
+            </Link>
+          </div>
         )}
         <div className="text-left space-y-3 mt-6 pt-6 border-t border-hairline">
           <Row label="Birthday" value={`${ordinal(profile.birth_day)} ${monthName(profile.birth_month)}`} />
