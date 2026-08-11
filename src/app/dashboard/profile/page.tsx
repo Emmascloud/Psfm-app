@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProfileForm from "./ProfileForm";
+import HomeLink from "@/components/HomeLink";
+import AvatarUpload from "@/components/AvatarUpload";
 import type { Profile } from "@/lib/types";
 
 export default async function ProfilePage() {
@@ -18,6 +20,12 @@ export default async function ProfilePage() {
   return (
     <main className="min-h-screen bg-ink flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-md">
+        <div className="flex items-center justify-between mb-6">
+          <HomeLink />
+          <Link href="/dashboard" className="font-data text-sm text-sage hover:text-cream transition-colors">
+            Dashboard →
+          </Link>
+        </div>
         <Link href="/dashboard" className="font-display text-lg text-cream block mb-10 text-center">
           PSFM <span className="text-marigold">Circle</span>
         </Link>
@@ -26,6 +34,15 @@ export default async function ProfilePage() {
           <p className="font-body text-sm text-ink-on-paper/60 mb-6">
             Only you can change this. It updates instantly for the circle.
           </p>
+          {user && (
+            <div className="mb-6 pb-6 border-b border-paper-dim">
+              <AvatarUpload
+                userId={user.id}
+                name={profile?.full_name ?? "You"}
+                currentUrl={profile?.avatar_url ?? null}
+              />
+            </div>
+          )}
           <ProfileForm profile={profile ?? null} />
         </div>
       </div>

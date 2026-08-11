@@ -2,8 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import HomeLink from "@/components/HomeLink";
 import { monthName, ordinal, type Profile } from "@/lib/types";
 import SuspendButton from "./SuspendButton";
+import ReportRow from "./ReportRow";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -27,9 +29,44 @@ export default async function AdminPage() {
 
   // Emails live in auth.users, not the public profiles table — fetched
   // here with the service-role key, server-side only, admin-gated above.
+  // If the key isn't configured yet, degrade gracefully instead of
+  // crashing the whole page.
   const admin = createAdminClient();
-  const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 });
-  const emailById = new Map(authUsers?.users.map((u) => [u.id, u.email]) ?? []);
+  let emailById = new Map<string, string | undefined>();
+  let emailLookupFailed = false;
+  if (admin) {
+    try {
+      const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 });
+      emailById = new Map(authUsers?.users.map((u) => [u.id, u.email]) ?? []);
+    } catch {
+      emailLookupFailed = true;
+    }
+  } else {
+    emailLookupFailed = true;
+  }
+
+  const { data: reports } = await supabase
+    .from("reports")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const postIds = (reports ?? []).filter((r) => r.target_type === "post").map((r) => r.target_id);
+  const commentIds = (reports ?? [])
+    .filter((r) => r.target_type === "comment")
+    .map((r) => r.target_id);
+
+  const [{ data: reportedPosts }, { data: reportedComments }] = await Promise.all([
+    postIds.length
+      ? supabase.from("posts").select("*").in("id", postIds)
+      : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
+    commentIds.length
+      ? supabase.from("comments").select("*").in("id", commentIds)
+      : Promise.resolve({ data: [] as { id: string; body: string; author_id: string }[] }),
+  ]);
+
+  const postById = new Map((reportedPosts ?? []).map((p) => [p.id, p]));
+  const commentById = new Map((reportedComments ?? []).map((c) => [c.id, c]));
+  const nameById = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
 
   return (
     <main className="min-h-screen bg-ink">
@@ -43,12 +80,23 @@ export default async function AdminPage() {
             Back to Circle
           </Link>
         </header>
+        <div className="mb-6">
+          <HomeLink />
+        </div>
 
         <h1 className="font-display text-2xl text-cream mb-1">Members</h1>
         <p className="font-body text-sm text-sage mb-6">
           {profiles?.length ?? 0} members · visible here so you can reach out
           for birthdays/anniversaries and moderate accounts.
         </p>
+
+        {emailLookupFailed && (
+          <p className="font-body text-sm text-ember bg-ember/10 rounded-lg px-4 py-3 mb-6">
+            Couldn't load member emails — SUPABASE_SERVICE_ROLE_KEY is
+            missing or incorrect in this environment's variables. Everything
+            else on this page still works.
+          </p>
+        )}
 
         <div className="rounded-2xl bg-panel overflow-hidden">
           <table className="w-full text-left">
@@ -91,6 +139,36 @@ export default async function AdminPage() {
             </tbody>
           </table>
         </div>
+
+        {(reports?.length ?? 0) > 0 && (
+          <div className="mt-10">
+            <h2 className="font-display text-xl text-cream mb-1">Reported content</h2>
+            <p className="font-body text-sm text-sage mb-4">
+              {reports?.length} open report{reports?.length === 1 ? "" : "s"} from members.
+            </p>
+            <div className="space-y-3">
+              {reports?.map((r) => {
+                const content =
+                  r.target_type === "post" ? postById.get(r.target_id) : commentById.get(r.target_id);
+                if (!content) return null;
+                return (
+                  <div key={r.id} className="rounded-xl bg-panel p-4 flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-data text-xs text-marigold uppercase mb-1">
+                        {r.target_type} · by {nameById.get(content.author_id) ?? "unknown"}
+                      </p>
+                      <p className="font-body text-cream text-sm">{content.body}</p>
+                      <p className="font-data text-xs text-sage mt-1">
+                        reported by {nameById.get(r.reporter_id) ?? "a member"}
+                      </p>
+                    </div>
+                    <ReportRow reportId={r.id} targetType={r.target_type} targetId={r.target_id} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

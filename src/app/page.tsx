@@ -8,7 +8,7 @@ export default function Home() {
       <div className="mx-auto max-w-5xl px-6 py-16 md:py-24">
         <header className="flex items-center justify-between mb-20">
           <span className="font-display text-lg tracking-wide text-cream">
-            PSMF <span className="text-marigold">Family</span>
+            PSFM <span className="text-marigold">Circle</span>
           </span>
           <nav className="flex items-center gap-6 font-data text-sm">
             <Link href="/rules" className="text-sage hover:text-cream transition-colors hidden sm:inline">
@@ -21,7 +21,7 @@ export default function Home() {
               href="/signup"
               className="rounded-full bg-marigold px-4 py-2 text-ink-on-paper font-medium hover:bg-marigold-soft transition-colors"
             >
-              Join the family
+              Join the circle
             </Link>
           </nav>
         </header>
@@ -29,7 +29,7 @@ export default function Home() {
         <section className="grid md:grid-cols-[1.2fr_0.8fr] gap-16 items-center">
           <div>
             <p className="font-data text-sm text-marigold mb-4 tracking-widest uppercase">
-              Peculiar Singles &amp; Married Forum
+              Peculiar Singles &amp; Married
             </p>
             <h1 className="font-display text-5xl md:text-6xl leading-[1.05] text-cream mb-6">
               Kept, and keeping

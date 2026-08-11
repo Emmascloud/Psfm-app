@@ -11,9 +11,28 @@ export type Profile = {
   birth_day: number; // 1-31
   anniversary_month: number | null;
   anniversary_day: number | null;
+  avatar_url: string | null;
   is_admin: boolean;
   is_suspended: boolean;
   updated_at: string;
+};
+
+export type Post = {
+  id: string;
+  author_id: string;
+  body: string;
+  image_url: string | null;
+  reported: boolean;
+  created_at: string;
+};
+
+export type Comment = {
+  id: string;
+  post_id: string;
+  author_id: string;
+  body: string;
+  reported: boolean;
+  created_at: string;
 };
 
 // Days from Jan 1 for a given month/day, used to place points on the wheel.

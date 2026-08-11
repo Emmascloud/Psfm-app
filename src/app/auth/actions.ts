@@ -135,3 +135,16 @@ export async function toggleSuspension(userId: string, suspend: boolean) {
   revalidatePath("/admin");
   return { error: null };
 }
+
+export async function updateAvatar(url: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard/members");
+}
