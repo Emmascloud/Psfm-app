@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Avatar from "./Avatar";
 import ThemeToggle from "./ThemeToggle";
+import NotificationBell from "./NotificationBell";
+import { PresenceProvider } from "./PresenceProvider";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/client";
 
@@ -20,6 +22,7 @@ const BASE_LINKS = [
   { href: "/dashboard/feed", label: "Feed", key: "feed" },
   { href: "/dashboard/chat", label: "Chat", key: "chat" },
   { href: "/dashboard/inbox", label: "Inbox", key: "inbox" },
+  { href: "/dashboard/connections", label: "Connections", key: null },
   { href: "/dashboard/members", label: "Members", key: null },
   { href: "/rules", label: "Rules", key: null },
   { href: "/dashboard/profile", label: "My profile", key: null },
@@ -81,6 +84,7 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
   }, [user.id]);
 
   return (
+    <PresenceProvider userId={user.id}>
     <div className="min-h-screen bg-ink lg:grid lg:grid-cols-[260px_1fr]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 border-r border-hairline px-6 py-8">
@@ -117,6 +121,7 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
               </form>
             </div>
           </div>
+          <NotificationBell />
           <ThemeToggle />
         </div>
       </aside>
@@ -127,6 +132,7 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
           PSMF <span className="text-marigold">Family</span>
         </Link>
         <div className="flex items-center gap-1">
+          <NotificationBell />
           <ThemeToggle />
           <button
             onClick={() => setOpen(!open)}
@@ -181,5 +187,6 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
 
       <main className="min-w-0">{children}</main>
     </div>
+    </PresenceProvider>
   );
 }

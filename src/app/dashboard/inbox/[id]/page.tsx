@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Avatar from "@/components/Avatar";
+import PresentAvatar from "@/components/PresentAvatar";
 import DMThread from "@/components/DMThread";
 import type { DirectMessage, Profile } from "@/lib/types";
 
@@ -38,7 +38,7 @@ export default async function DMThreadPage({
         ← Inbox
       </Link>
       <div className="flex items-center gap-3 mb-4">
-        <Avatar url={other.avatar_url} name={other.full_name} size={36} />
+        <PresentAvatar userId={other.id} url={other.avatar_url} name={other.full_name} size={36} />
         <Link
           href={`/dashboard/members/${other.id}`}
           className="font-display text-lg text-cream hover:text-marigold transition-colors"

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import { usePresence } from "@/components/PresenceProvider";
 import ReactionBar from "./ReactionBar";
 import { deletePost, deleteComment, createComment, editPost, reportContent } from "@/lib/posts/actions";
 import type { Comment } from "@/lib/types";
@@ -48,6 +49,7 @@ export default function PostCard({
   myReaction?: string | null;
 }) {
   const author = authorsById.get(post.author_id);
+  const authorOnline = usePresence(post.author_id);
   const isMine = currentUserId === post.author_id;
   const canDeletePost = isMine || isAdmin;
   const [pending, startTransition] = useTransition();
@@ -75,7 +77,7 @@ export default function PostCard({
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <Link href={`/dashboard/members/${post.author_id}`}>
-            <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={30} />
+            <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={30} online={authorOnline} />
           </Link>
           <div>
             <Link

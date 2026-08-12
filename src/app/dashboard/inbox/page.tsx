@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import Avatar from "@/components/Avatar";
+import PresentAvatar from "@/components/PresentAvatar";
 import type { DirectMessage } from "@/lib/types";
 
 export default async function InboxPage() {
@@ -58,7 +58,7 @@ export default async function InboxPage() {
                 href={`/dashboard/inbox/${otherId}`}
                 className="flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
               >
-                <Avatar url={other?.avatar_url} name={other?.full_name ?? "?"} size={40} />
+                <PresentAvatar userId={otherId} url={other?.avatar_url} name={other?.full_name ?? "?"} size={40} />
                 <div className="min-w-0 flex-1">
                   <p className="font-body text-cream truncate">{other?.full_name ?? "Member"}</p>
                   <p className="font-body text-sage text-sm truncate">

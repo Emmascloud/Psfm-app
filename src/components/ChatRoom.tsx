@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { usePresence } from "@/components/PresenceProvider";
 import { sendMessage, deleteMessage, reportMessage } from "@/lib/chat/actions";
 import Avatar from "@/components/Avatar";
 import type { Message } from "@/lib/types";
@@ -123,7 +124,7 @@ export default function ChatRoom({
                 <div className="w-7 shrink-0">
                   {!groupedWithPrev && !mine && (
                     <Link href={`/dashboard/members/${m.author_id}`}>
-                      <Avatar url={author?.avatar_url} name={author?.full_name ?? "?"} size={28} />
+                      <ChatAvatar authorId={m.author_id} url={author?.avatar_url} name={author?.full_name ?? "?"} />
                     </Link>
                   )}
                 </div>
@@ -222,4 +223,17 @@ export default function ChatRoom({
       )}
     </div>
   );
+}
+
+function ChatAvatar({
+  authorId,
+  url,
+  name,
+}: {
+  authorId: string;
+  url: string | null | undefined;
+  name: string;
+}) {
+  const online = usePresence(authorId);
+  return <Avatar url={url} name={name} size={28} online={online} />;
 }

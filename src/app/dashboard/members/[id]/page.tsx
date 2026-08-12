@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Avatar from "@/components/Avatar";
+import PresentAvatar from "@/components/PresentAvatar";
 import { monthName, ordinal, type Profile, type Post, type Comment } from "@/lib/types";
 import PostForm from "@/components/posts/PostForm";
 import PostCard from "@/components/posts/PostCard";
@@ -85,7 +85,7 @@ export default async function MemberProfilePage({
 
       <div className="rounded-2xl bg-panel p-8 text-center mb-8">
         <div className="flex justify-center mb-4">
-          <Avatar url={profile.avatar_url} name={profile.full_name} size={72} />
+          <PresentAvatar userId={profile.id} url={profile.avatar_url} name={profile.full_name} size={72} />
         </div>
         <h1 className="font-display text-2xl text-cream mb-1">{profile.full_name}</h1>
         {profile.status && (
@@ -95,12 +95,25 @@ export default async function MemberProfilePage({
         )}
 
         <div className="flex items-center justify-center gap-4 mb-4 font-data text-xs text-sage">
-          <span>
-            <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
-          </span>
-          <span>
-            <span className="text-cream font-medium">{following?.length ?? 0}</span> following
-          </span>
+          {isOwnProfile ? (
+            <>
+              <Link href="/dashboard/connections?tab=followers" className="hover:text-cream transition-colors">
+                <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
+              </Link>
+              <Link href="/dashboard/connections?tab=following" className="hover:text-cream transition-colors">
+                <span className="text-cream font-medium">{following?.length ?? 0}</span> following
+              </Link>
+            </>
+          ) : (
+            <>
+              <span>
+                <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
+              </span>
+              <span>
+                <span className="text-cream font-medium">{following?.length ?? 0}</span> following
+              </span>
+            </>
+          )}
         </div>
 
         {!isOwnProfile && user && (

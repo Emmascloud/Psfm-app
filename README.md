@@ -14,9 +14,9 @@ Next.js (App Router) + Supabase.
 5. `supabase/migration_05_reactions_edits.sql` (2 sections)
 6. `supabase/migration_06_contact.sql` (3 sections)
 7. `supabase/migration_07_dms.sql` (3 sections)
-8. `supabase/migration_08_follows.sql` (2 sections) — **new this round**:
-   follow/unfollow between members, with live follower/following counts
-   on each profile.
+8. `supabase/migration_08_follows.sql` (2 sections)
+9. `supabase/migration_09_push.sql` (2 sections) — **new this round**:
+   stores each device that turns on push notifications.
 
 ### Making yourself an admin
 
@@ -115,6 +115,79 @@ None of that can be done inside this environment — no Android SDK, no
 Mac. What I *can* do next: add the Capacitor config to this project so
 it's ready to build the moment you (or someone with the right machine)
 run it. Say the word and I'll scaffold that in.
+
+## What's new this round
+
+- **Online/offline status** — a small dot on avatars (green = online,
+  gray = offline) in Chat, Feed, Members, Inbox, and profile pages, via
+  Supabase Realtime Presence. Updates live, no refresh needed.
+- **Connections** (`/dashboard/connections`) — your followers and
+  following, in one place. The counts on your own profile link there
+  now too.
+- **Real push notifications** — the bell icon in the nav turns on
+  actual OS-level notifications for this device (the kind that show up
+  in your phone's notification shade even if the site isn't open). New
+  chat messages, new DMs, and new posts from people you follow all
+  trigger one.
+
+### Setting up push notifications — one manual step in Supabase
+
+This is the one piece that can't be fully wired from code alone, because
+it needs Supabase itself to tell your app when something new happens.
+
+1. **Environment variables** — four new ones, already generated for you
+   in `.env.local.example`: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`,
+   `VAPID_PRIVATE_KEY`, `VAPID_CONTACT_EMAIL` (put your real email),
+   and `PUSH_WEBHOOK_SECRET`. Add all four locally and on Vercel
+   (Production), same as always — then redeploy.
+2. **Create three Database Webhooks** in Supabase: Database → Webhooks
+   → Create a new webhook. Do this three times, once per table:
+   - Table: `messages` — Events: Insert
+   - Table: `direct_messages` — Events: Insert
+   - Table: `posts` — Events: Insert
+
+   For each one:
+   - **Type**: HTTP Request
+   - **URL**: `https://<your-vercel-domain>/api/push/send`
+   - **Method**: POST
+   - **HTTP Headers**: add one — `x-webhook-secret` set to the exact
+     same value as `PUSH_WEBHOOK_SECRET` in your env vars. This is what
+     stops a stranger from hitting the endpoint and spamming your
+     members with fake notifications.
+3. That's it — send a chat message from a second account (or ask
+   someone else to) and the first account should get a real
+   notification, even with the site closed, as long as that device
+   turned notifications on via the bell icon first.
+
+### A scaling note, worth knowing now rather than later
+
+Chat notifications currently fan out to *every* member with
+notifications enabled, on every message — fine at your current size,
+but as the group grows past a few hundred simultaneously-subscribed
+devices, sending them all from one serverless function invocation will
+start to get slow and eventually risk hitting Vercel's function time
+limit. The fix when you get there is batching (send in chunks of ~50
+with a queue) rather than one big `Promise.allSettled` — flagging it now
+so it's a known, expected next step rather than a surprise later.
+
+## On Google not showing PSMF Family yet
+
+That screenshot isn't a bug — it's completely normal for a brand-new
+site. Google doesn't index a site the moment it exists; it has to
+discover and crawl it first, which can take days to weeks on its own.
+Now that `robots.txt` and `sitemap.xml` exist (last round), the way to
+speed that up is **Google Search Console** (search-console, free, uses
+your Google account):
+
+1. Add your site as a property (you'll verify ownership — easiest way
+   is a DNS TXT record if you have a custom domain, or the HTML meta
+   tag method if you're still on the `.vercel.app` domain).
+2. Submit `https://<your-domain>/sitemap.xml` under Sitemaps.
+3. Use "Request Indexing" on your homepage URL to nudge it along.
+
+This doesn't guarantee ranking well for a search term — that's a much
+longer game (backlinks, content, time) — but it's what gets the site
+*findable* at all, which is the immediate gap that screenshot showed.
 
 ## Deliberately not in this round
 

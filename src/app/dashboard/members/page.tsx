@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import Avatar from "@/components/Avatar";
+import PresentAvatar from "@/components/PresentAvatar";
 import ScrollTopButton from "@/components/ScrollTopButton";
 import { monthName, ordinal, type Profile } from "@/lib/types";
 
@@ -23,7 +23,7 @@ export default async function MembersPage() {
               href={`/dashboard/members/${p.id}`}
               className="flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
             >
-              <Avatar url={p.avatar_url} name={p.full_name} size={40} />
+              <PresentAvatar userId={p.id} url={p.avatar_url} name={p.full_name} size={40} />
               <div className="min-w-0">
                 <p className="font-body text-cream truncate">{p.full_name}</p>
                 <p className="font-data text-xs text-sage mt-1">
