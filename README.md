@@ -66,6 +66,56 @@ Unchanged — still three: `NEXT_PUBLIC_SUPABASE_URL`,
   accept/decline flow. Say if you'd rather it require mutual
   acceptance instead.
 
+## What's new this round
+
+- **SEO** — `robots.txt` and `sitemap.xml` are now generated
+  automatically (`src/app/robots.ts`, `src/app/sitemap.ts`). Private
+  routes (`/dashboard`, `/admin`, auth pages) are explicitly blocked
+  from crawling — a relationship platform's member data has no reason
+  to show up in search results. Public pages (home, rules, signup,
+  login) get real titles/descriptions instead of one generic tag, plus
+  Open Graph and Twitter Card metadata so a shared link actually shows
+  a preview card (image + title + description) instead of a bare URL.
+  **One thing only you can do**: set `NEXT_PUBLIC_SITE_URL` in Vercel's
+  environment variables to your real domain once you have one — until
+  then it falls back to the `.vercel.app` URL, which works but isn't
+  what you want indexed long-term.
+- **Installable as a home-screen app** — `manifest.json` + icons mean
+  Android Chrome and iOS Safari can both "Add to Home Screen" and it
+  opens full-screen, no browser chrome, its own icon. This is real and
+  works today, on both platforms, with no app store involved.
+
+## On APK / iOS App Store distribution
+
+Worth being direct about what's realistic here. Home-screen install
+(above) is live now. Actual Google Play / Apple App Store listings are
+a different, bigger project — not because the web app isn't ready, but
+because of what those stores require outside of code:
+
+- A **Google Play Developer account** ($25 one-time) and an **Apple
+  Developer Program** membership ($99/year) — accounts only you can
+  create, tied to your identity/payment method.
+- Wrapping the site in a native shell — the standard tool for this is
+  **Capacitor**, which takes an existing web app and produces a real
+  Android project (buildable into an `.apk`/`.aab`) and a real iOS
+  Xcode project, both loading this site inside a native wrapper.
+- **Building the iOS half requires a Mac with Xcode.** There's no way
+  around this — Apple only allows iOS builds on their own OS. Android's
+  build can happen anywhere with Android Studio installed, including
+  Windows/Linux.
+- Both stores review every submission before it goes live (days, not
+  minutes), and both have content-policy angles worth knowing upfront
+  for a relationship/chat platform — Apple in particular scrutinizes
+  apps with user-generated chat and member profiles for moderation and
+  reporting tooling. The `/admin` reported-content system already
+  built here is exactly what that review looks for, so you're in a
+  reasonable position on that front already.
+
+None of that can be done inside this environment — no Android SDK, no
+Mac. What I *can* do next: add the Capacitor config to this project so
+it's ready to build the moment you (or someone with the right machine)
+run it. Say the word and I'll scaffold that in.
+
 ## Deliberately not in this round
 
 - The feed doesn't yet filter by "people I follow" — it's still

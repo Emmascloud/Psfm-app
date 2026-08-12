@@ -1,4 +1,10 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Group Rules",
+  description: "The PSMF Family community guidelines — read before you join.",
+};
 
 const RULES = [
   "Be respectful and kind at all times.",
