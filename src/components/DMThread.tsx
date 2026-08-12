@@ -29,6 +29,7 @@ export default function DMThread({
   const [body, setBody] = useState("");
   const [pending, startTransition] = useTransition();
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+  const [sendError, setSendError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -75,8 +76,19 @@ export default function DMThread({
     if (!body.trim()) return;
     const text = body;
     setBody("");
-    startTransition(() => {
-      sendDirectMessage(otherUserId, text);
+    setSendError(null);
+    startTransition(async () => {
+      const result = await sendDirectMessage(otherUserId, text);
+      if (result.error) {
+        setSendError(result.error);
+        setBody(text);
+        return;
+      }
+      if (result.message) {
+        setMessages((prev) =>
+          prev.some((x) => x.id === result.message!.id) ? prev : [...prev, result.message!],
+        );
+      }
     });
   }
 
@@ -144,6 +156,11 @@ export default function DMThread({
         <div ref={bottomRef} />
       </div>
 
+      {sendError && (
+        <p className="font-body text-xs text-ember px-4 pt-2 bg-ink-soft">
+          Couldn't send: {sendError}
+        </p>
+      )}
       <div className="flex items-center gap-2 px-4 py-3 border-t border-hairline bg-ink-soft">
         <input
           value={body}

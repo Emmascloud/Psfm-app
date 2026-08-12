@@ -1,22 +1,25 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import type { DirectMessage } from "@/lib/types";
 
 export async function sendDirectMessage(recipientId: string, body: string) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Sign in first." };
-  if (!body.trim()) return { error: null };
-  if (user.id === recipientId) return { error: "You can't message yourself." };
+  if (!user) return { error: "Sign in first.", message: null };
+  if (!body.trim()) return { error: null, message: null };
+  if (user.id === recipientId) return { error: "You can't message yourself.", message: null };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("direct_messages")
-    .insert({ sender_id: user.id, recipient_id: recipientId, body: body.trim() });
+    .insert({ sender_id: user.id, recipient_id: recipientId, body: body.trim() })
+    .select()
+    .single<DirectMessage>();
 
-  if (error) return { error: error.message };
-  return { error: null };
+  if (error) return { error: error.message, message: null };
+  return { error: null, message: data };
 }
 
 export async function deleteDirectMessage(messageId: string) {
