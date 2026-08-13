@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ActionState = { error: string | null };
 export type ForgotPasswordState = { error: string | null; sent: boolean };
@@ -25,6 +26,7 @@ export async function signUp(
     ? Number(formData.get("anniversary_day"))
     : null;
   const phone = String(formData.get("phone") || "").trim() || null;
+  const inviteToken = String(formData.get("invite_token") || "").trim() || null;
 
   if (!email || !password || !fullName || !birthMonth || !birthDay) {
     return { error: "Please fill in your name, birthday, email and password." };
@@ -50,6 +52,21 @@ export async function signUp(
 
   if (phone) {
     await supabase.from("contacts").insert({ id: data.user.id, phone });
+  }
+
+  if (inviteToken) {
+    // Only marks the one roster row this exact private link pointed
+    // to — the token is the authorization, so this needs the
+    // service-role client rather than the roster table's admin-only
+    // RLS policy (this new member isn't an admin).
+    const admin = createAdminClient();
+    if (admin) {
+      await admin
+        .from("roster")
+        .update({ claimed_by: data.user.id })
+        .eq("invite_token", inviteToken)
+        .is("claimed_by", null);
+    }
   }
 
   redirect("/dashboard");

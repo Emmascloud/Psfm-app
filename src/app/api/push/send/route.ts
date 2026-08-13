@@ -14,15 +14,40 @@ function configureWebPush() {
 
 type PushSub = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string };
 
-async function sendToUsers(admin: ReturnType<typeof createAdminClient>, userIds: string[], payload: object) {
-  if (!admin || userIds.length === 0) return;
-  const { data: subs } = await admin
+type SendReport = {
+  recipientsConsidered: number;
+  subscriptionsFound: number;
+  sent: number;
+  failed: number;
+  sampleErrors: string[];
+};
+
+async function sendToUsers(
+  admin: ReturnType<typeof createAdminClient>,
+  userIds: string[],
+  payload: object,
+): Promise<SendReport> {
+  const report: SendReport = {
+    recipientsConsidered: userIds.length,
+    subscriptionsFound: 0,
+    sent: 0,
+    failed: 0,
+    sampleErrors: [],
+  };
+  if (!admin || userIds.length === 0) return report;
+
+  const { data: subs, error: subsError } = await admin
     .from("push_subscriptions")
     .select("*")
     .in("user_id", userIds)
     .returns<PushSub[]>();
 
-  if (!subs || subs.length === 0) return;
+  if (subsError) {
+    report.sampleErrors.push(`subscription lookup failed: ${subsError.message}`);
+    return report;
+  }
+  if (!subs || subs.length === 0) return report;
+  report.subscriptionsFound = subs.length;
 
   const results = await Promise.allSettled(
     subs.map((s) =>
@@ -33,16 +58,21 @@ async function sendToUsers(admin: ReturnType<typeof createAdminClient>, userIds:
     ),
   );
 
-  // Clean up subscriptions the push service says are gone (expired,
-  // uninstalled, permission revoked, etc.) so we stop retrying them.
   const dead: string[] = [];
   results.forEach((r, i) => {
-    if (r.status === "rejected") {
-      const status = (r.reason as { statusCode?: number })?.statusCode;
-      if (status === 404 || status === 410) dead.push(subs[i].id);
+    if (r.status === "fulfilled") {
+      report.sent += 1;
+      return;
     }
+    report.failed += 1;
+    const reason = r.reason as { statusCode?: number; body?: string; message?: string };
+    const msg = `status ${reason?.statusCode ?? "?"}: ${reason?.body || reason?.message || "unknown error"}`;
+    if (report.sampleErrors.length < 5) report.sampleErrors.push(msg);
+    if (reason?.statusCode === 404 || reason?.statusCode === 410) dead.push(subs[i].id);
   });
+
   if (dead.length) await admin.from("push_subscriptions").delete().in("id", dead);
+  return report;
 }
 
 function truncate(text: string, max = 90) {
@@ -66,12 +96,20 @@ export async function POST(request: Request) {
   const table = body.table as string;
   const record = body.record as Record<string, unknown>;
 
+  let report: SendReport = {
+    recipientsConsidered: 0,
+    subscriptionsFound: 0,
+    sent: 0,
+    failed: 0,
+    sampleErrors: [],
+  };
+
   if (table === "messages") {
     const authorId = record.author_id as string;
     const { data: author } = await admin.from("profiles").select("full_name").eq("id", authorId).single();
     const { data: everyone } = await admin.from("profiles").select("id").neq("id", authorId);
     const recipientIds = (everyone ?? []).map((p) => p.id);
-    await sendToUsers(admin, recipientIds, {
+    report = await sendToUsers(admin, recipientIds, {
       title: "New message in Family Chat",
       body: `${author?.full_name ?? "Someone"}: ${truncate(String(record.body ?? ""))}`,
       url: "/dashboard/chat",
@@ -80,7 +118,7 @@ export async function POST(request: Request) {
     const senderId = record.sender_id as string;
     const recipientId = record.recipient_id as string;
     const { data: sender } = await admin.from("profiles").select("full_name").eq("id", senderId).single();
-    await sendToUsers(admin, [recipientId], {
+    report = await sendToUsers(admin, [recipientId], {
       title: `${sender?.full_name ?? "Someone"} sent you a message`,
       body: truncate(String(record.body ?? "")),
       url: `/dashboard/inbox/${senderId}`,
@@ -90,12 +128,14 @@ export async function POST(request: Request) {
     const { data: author } = await admin.from("profiles").select("full_name").eq("id", authorId).single();
     const { data: followers } = await admin.from("follows").select("follower_id").eq("following_id", authorId);
     const recipientIds = (followers ?? []).map((f) => f.follower_id);
-    await sendToUsers(admin, recipientIds, {
+    report = await sendToUsers(admin, recipientIds, {
       title: `${author?.full_name ?? "Someone"} posted something new`,
       body: truncate(String(record.body ?? "")),
       url: `/dashboard/members/${authorId}`,
     });
+  } else {
+    return NextResponse.json({ ok: true, note: `no handler for table "${table}"` });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, table, ...report });
 }

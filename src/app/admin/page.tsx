@@ -90,7 +90,12 @@ export default async function AdminPage() {
     <AppShell user={{ id: user.id, name: profiles?.find((p) => p.id === user.id)?.full_name ?? "Admin", avatarUrl: profiles?.find((p) => p.id === user.id)?.avatar_url ?? null, isAdmin: true }}>
       <div className="px-6 py-8 lg:px-10 lg:py-10 max-w-5xl">
         <p className="font-data text-xs text-ember uppercase tracking-widest mb-2">Admin</p>
-        <h1 className="font-display text-2xl text-cream mb-1">Members</h1>
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="font-display text-2xl text-cream">Members</h1>
+          <Link href="/admin/roster" className="font-data text-sm text-marigold hover:text-marigold-soft transition-colors">
+            Roster & invites →
+          </Link>
+        </div>
         <p className="font-body text-sm text-sage mb-6">
           {profiles?.length ?? 0} members · click a name for their full profile
           and timeline · reach out for birthdays/anniversaries and moderate

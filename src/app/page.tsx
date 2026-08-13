@@ -91,9 +91,15 @@ export default function Home() {
           />
         </section>
 
-        <footer className="mt-16 pt-8 border-t border-hairline">
+        <footer className="mt-16 pt-8 border-t border-hairline flex flex-wrap gap-x-6 gap-y-2">
           <Link href="/rules" className="font-data text-sm text-sage hover:text-cream transition-colors">
             Read the group rules →
+          </Link>
+          <Link href="/privacy" className="font-data text-sm text-sage hover:text-cream transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="font-data text-sm text-sage hover:text-cream transition-colors">
+            Terms of Service
           </Link>
         </footer>
       </div>

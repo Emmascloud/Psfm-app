@@ -18,10 +18,10 @@ Next.js (App Router) + Supabase.
 9. `supabase/migration_09_push.sql` (2 sections)
 10. `supabase/migration_10_push_triggers.sql` (3 sections, edit the URL
     and secret placeholders in section 2 before running it)
-11. `supabase/migration_11_owner.sql` (2 sections) — **new this
-    round**: marks your account as the permanent owner, so any admin
-    you add later can moderate regular members but can never suspend
-    you or another admin.
+11. `supabase/migration_11_owner.sql` (2 sections)
+12. `supabase/migration_12_roster.sql` (1 section), then
+    `supabase/migration_12b_roster_data.sql` (1 section, run once —
+    seeds the roster with the original 152-person WhatsApp list)
 
 ### Making yourself an admin
 
@@ -193,6 +193,37 @@ your Google account):
 This doesn't guarantee ranking well for a search term — that's a much
 longer game (backlinks, content, time) — but it's what gets the site
 *findable* at all, which is the immediate gap that screenshot showed.
+
+## What's new this round
+
+- **Privacy Policy and Terms of Service** — `/privacy` and `/terms`,
+  linked from the homepage footer and required (checkbox) before
+  signup. These are honest, real-content drafts covering what's
+  actually collected and how it's used — **not finished legal
+  documents**. Have an actual lawyer look at both before treating them
+  as binding, especially before opening the platform beyond your
+  existing WhatsApp group.
+
+- **Bringing the original 150+ WhatsApp names onto the site** — via a
+  roster + private invite link, not a bulk-created-accounts script.
+  Worth explaining why, since "bulk create the accounts" was the
+  original ask: **we never had real email addresses for anyone on that
+  list** — only names and birthdays. An account needs a real email its
+  owner controls (to sign in again, to reset a forgotten password); a
+  made-up placeholder email can't do either of those things, so
+  bulk-creating accounts against fake emails would've meant 150 people
+  locked out of their own accounts with no way back in.
+
+  What this does instead: `/admin/roster` lists all 152 people from the
+  original list (pre-loaded by `migration_12b`) with a **"Copy invite
+  link"** button next to each unclaimed one. That link is private and
+  unguessable (a random token, not the person's name) — send it to
+  that person directly on WhatsApp. When they open it, `/signup` is
+  already filled in with their name and birthday from the original
+  list; they just add their own real email and password. Once they
+  sign up, that link is marked claimed and the roster shows it as
+  done — so an admin can see who's joined at a glance and knows exactly
+  who's still owed a link.
 
 ## Deliberately not in this round
 
