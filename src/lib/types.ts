@@ -13,6 +13,7 @@ export type Profile = {
   anniversary_day: number | null;
   avatar_url: string | null;
   is_admin: boolean;
+  is_owner: boolean;
   is_suspended: boolean;
   updated_at: string;
 };

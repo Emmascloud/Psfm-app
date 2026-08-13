@@ -131,10 +131,21 @@ export async function toggleSuspension(userId: string, suspend: boolean) {
 
   const { data: me } = await supabase
     .from("profiles")
-    .select("is_admin")
+    .select("is_admin, is_owner")
     .eq("id", user.id)
     .single();
   if (!me?.is_admin) return { error: "Admins only." };
+
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("is_admin, is_owner")
+    .eq("id", userId)
+    .single();
+
+  if (target?.is_owner) return { error: "The owner can't be suspended." };
+  if (target?.is_admin && !me.is_owner) {
+    return { error: "Only the owner can suspend another admin." };
+  }
 
   const { error } = await supabase
     .from("profiles")

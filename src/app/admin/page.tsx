@@ -16,7 +16,7 @@ export default async function AdminPage() {
 
   const { data: me } = await supabase
     .from("profiles")
-    .select("is_admin")
+    .select("is_admin, is_owner")
     .eq("id", user.id)
     .single();
   if (!me?.is_admin) redirect("/dashboard");
@@ -127,8 +127,12 @@ export default async function AdminPage() {
                     >
                       {p.full_name}
                     </Link>
-                    {p.is_admin && (
-                      <span className="ml-2 font-data text-[10px] text-marigold">ADMIN</span>
+                    {p.is_owner ? (
+                      <span className="ml-2 font-data text-[10px] text-ember">OWNER</span>
+                    ) : (
+                      p.is_admin && (
+                        <span className="ml-2 font-data text-[10px] text-marigold">ADMIN</span>
+                      )
                     )}
                   </td>
                   <td className="font-body text-sage text-sm px-4 py-3">
@@ -148,7 +152,9 @@ export default async function AdminPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {!p.is_admin && <SuspendButton userId={p.id} suspended={p.is_suspended} />}
+                    {!p.is_owner && (!p.is_admin || me.is_owner) && (
+                      <SuspendButton userId={p.id} suspended={p.is_suspended} />
+                    )}
                   </td>
                 </tr>
               ))}

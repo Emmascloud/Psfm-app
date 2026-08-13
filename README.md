@@ -15,8 +15,13 @@ Next.js (App Router) + Supabase.
 6. `supabase/migration_06_contact.sql` (3 sections)
 7. `supabase/migration_07_dms.sql` (3 sections)
 8. `supabase/migration_08_follows.sql` (2 sections)
-9. `supabase/migration_09_push.sql` (2 sections) — **new this round**:
-   stores each device that turns on push notifications.
+9. `supabase/migration_09_push.sql` (2 sections)
+10. `supabase/migration_10_push_triggers.sql` (3 sections, edit the URL
+    and secret placeholders in section 2 before running it)
+11. `supabase/migration_11_owner.sql` (2 sections) — **new this
+    round**: marks your account as the permanent owner, so any admin
+    you add later can moderate regular members but can never suspend
+    you or another admin.
 
 ### Making yourself an admin
 
