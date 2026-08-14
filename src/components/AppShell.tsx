@@ -23,6 +23,7 @@ const BASE_LINKS = [
   { href: "/dashboard/chat", label: "Chat", key: "chat" },
   { href: "/dashboard/inbox", label: "Inbox", key: "inbox" },
   { href: "/dashboard/connections", label: "Connections", key: null },
+  { href: "/dashboard/events", label: "Events", key: "events" },
   { href: "/dashboard/members", label: "Members", key: null },
   { href: "/rules", label: "Rules", key: null },
   { href: "/dashboard/profile", label: "My profile", key: null },
@@ -76,6 +77,11 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
           }
         },
       )
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "events" }, () => {
+        if (!window.location.pathname.startsWith("/dashboard/events")) {
+          setBadges((prev) => ({ ...prev, events: true }));
+        }
+      })
       .subscribe();
 
     return () => {

@@ -133,6 +133,18 @@ export async function POST(request: Request) {
       body: truncate(String(record.body ?? "")),
       url: `/dashboard/members/${authorId}`,
     });
+  } else if (table === "events") {
+    const createdBy = record.created_by as string;
+    const { data: everyone } = await admin.from("profiles").select("id").neq("id", createdBy);
+    const recipientIds = (everyone ?? []).map((p) => p.id);
+    const when = record.starts_at
+      ? new Date(String(record.starts_at)).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+      : "";
+    report = await sendToUsers(admin, recipientIds, {
+      title: `New event: ${String(record.title ?? "")}`,
+      body: [when, record.location ? String(record.location) : null].filter(Boolean).join(" · "),
+      url: "/dashboard/events",
+    });
   } else {
     return NextResponse.json({ ok: true, note: `no handler for table "${table}"` });
   }

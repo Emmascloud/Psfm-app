@@ -22,6 +22,11 @@ Next.js (App Router) + Supabase.
 12. `supabase/migration_12_roster.sql` (1 section), then
     `supabase/migration_12b_roster_data.sql` (1 section, run once —
     seeds the roster with the original 152-person WhatsApp list)
+13. `supabase/migration_13_rls_hardening.sql` (4 sections) — **new
+    this round**, see "Security pass" below
+14. `supabase/migration_14_events.sql` (3 sections) — **new this
+    round**, events + RSVPs. Requires migration 10 to already be
+    applied (it reuses that migration's push-notify function).
 
 ### Making yourself an admin
 
@@ -224,6 +229,58 @@ longer game (backlinks, content, time) — but it's what gets the site
   sign up, that link is marked claimed and the roster shows it as
   done — so an admin can see who's joined at a glance and knows exactly
   who's still owed a link.
+
+## Security pass — what was found and fixed
+
+Reviewed every RLS policy across all twelve prior migrations together,
+as one system, rather than each in isolation — that's the kind of gap
+that's invisible looking at any single migration alone. Found four,
+none exploitable through the app's own screens, all exploitable by
+calling Supabase's REST API directly with a valid member session
+(which every signed-up member has, whether they'd think to use it or
+not):
+
+1. **The big one.** Your own "update your own profile" policy checked
+   *whose* row was being changed, but never *which columns*. That
+   meant any signed-up member could have called the API directly and
+   set `is_admin = true` on their own account — instant admin, no
+   approval needed. The same gap let a suspended member quietly
+   un-suspend themselves before their session expired. Fixed with a
+   database trigger that blocks changes to admin/owner/suspension
+   status unless the person making the change is actually authorized
+   to — this closes the hole regardless of which policy let the update
+   through in the first place, which is a sturdier fix than patching
+   the policy alone.
+2. **Post editing was silently broken.** The "Edit" button has had no
+   matching database permission since it was built — Postgres quietly
+   accepts an update that touches zero rows instead of erroring, so it
+   likely looked like edits were saving when they weren't. Fixed.
+3. A DM's recipient could technically rewrite the message body they
+   received, not just mark it read — meaning a reported message could
+   be edited after the fact. Locked down to read-receipts only.
+4. `push_subscriptions` was missing an UPDATE permission needed by the
+   re-enable flow in some edge cases. Added.
+
+One thing I did **not** change, worth knowing about rather than
+surprising you later: profile photos and post images are stored in a
+bucket that's technically fetchable by direct URL without signing in —
+this is a common, accepted tradeoff (the URLs aren't listed or
+guessable, just not cryptographically private), and switching to fully
+private, signed image URLs is a real architecture change with its own
+costs. Flagging it now so it's a deliberate choice, not an oversight.
+
+## Events
+
+- **`/dashboard/events`** — every member sees upcoming events with
+  Going/Interested RSVP buttons and a live count, plus a short list of
+  past ones.
+- **`/admin/events`** — admin-only: create an event (title, date/time,
+  optional location, link, description) and see RSVP counts per event.
+  Only admins can create or edit events, same pattern as the group
+  rules — this is announcements, not a member-generated feed.
+- New events trigger a push notification to everyone, reusing the same
+  infrastructure from migration 10 — no additional webhook setup
+  needed if that's already running.
 
 ## Deliberately not in this round
 

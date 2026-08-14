@@ -74,6 +74,24 @@ export type Follow = {
   created_at: string;
 };
 
+export type Event = {
+  id: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  event_link: string | null;
+  starts_at: string;
+  created_by: string;
+  created_at: string;
+};
+
+export type EventRsvp = {
+  event_id: string;
+  user_id: string;
+  status: "going" | "interested";
+  created_at: string;
+};
+
 // Days from Jan 1 for a given month/day, used to place points on the wheel.
 // Uses a non-leap reference year since we never store birth years.
 export function dayOfYear(month: number, day: number): number {
