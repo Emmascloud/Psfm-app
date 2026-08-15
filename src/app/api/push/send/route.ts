@@ -145,6 +145,15 @@ export async function POST(request: Request) {
       body: [when, record.location ? String(record.location) : null].filter(Boolean).join(" · "),
       url: "/dashboard/events",
     });
+  } else if (table === "birthday") {
+    const profileId = record.profile_id as string;
+    const { data: everyone } = await admin.from("profiles").select("id").neq("id", profileId);
+    const recipientIds = (everyone ?? []).map((p) => p.id);
+    report = await sendToUsers(admin, recipientIds, {
+      title: `🎉 It's ${String(record.full_name ?? "someone's")}'s birthday!`,
+      body: "Stop by their profile and wish them well.",
+      url: `/dashboard/members/${profileId}`,
+    });
   } else {
     return NextResponse.json({ ok: true, note: `no handler for table "${table}"` });
   }

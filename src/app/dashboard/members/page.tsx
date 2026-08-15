@@ -21,7 +21,7 @@ export default async function MembersPage() {
           <li key={p.id}>
             <Link
               href={`/dashboard/members/${p.id}`}
-              className="flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
+              className="card-float flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
             >
               <PresentAvatar userId={p.id} url={p.avatar_url} name={p.full_name} size={40} />
               <div className="min-w-0">

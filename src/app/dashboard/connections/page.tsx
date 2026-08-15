@@ -60,7 +60,7 @@ export default async function ConnectionsPage({
             <Link
               key={p.id}
               href={`/dashboard/members/${p.id}`}
-              className="flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
+              className="card-float flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
             >
               <PresentAvatar userId={p.id} url={p.avatar_url} name={p.full_name} size={40} />
               <p className="font-body text-cream">{p.full_name}</p>

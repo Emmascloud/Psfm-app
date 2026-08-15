@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import ActionMenu from "@/components/ActionMenu";
 import { usePresence } from "@/components/PresenceProvider";
 import ReactionBar from "./ReactionBar";
 import { deletePost, deleteComment, createComment, editPost, reportContent } from "@/lib/posts/actions";
@@ -73,7 +74,7 @@ export default function PostCard({
   }
 
   return (
-    <div className="rounded-2xl bg-panel p-4 shadow-sm shadow-black/10">
+    <div className="card-float rounded-2xl bg-panel p-4 shadow-sm shadow-black/10">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <Link href={`/dashboard/members/${post.author_id}`}>
@@ -93,39 +94,46 @@ export default function PostCard({
           </div>
         </div>
         <div className="flex gap-1.5">
-          {isMine && !editing && (
-            <button
-              onClick={() => {
-                setDraft(body);
-                setEditing(true);
-              }}
-              className="font-data text-[11px] text-cream/80 hover:text-cream bg-panel-raised hover:bg-panel-raised/80 rounded-full px-2.5 py-1 transition-colors"
-            >
-              Edit
-            </button>
-          )}
-          {!reported && currentUserId && currentUserId !== post.author_id && (
-            <button
-              onClick={() =>
-                startTransition(() => {
-                  reportContent("post", post.id, profileId);
-                  setReported(true);
-                })
-              }
-              className="font-data text-[11px] text-cream/80 hover:text-ember bg-panel-raised hover:bg-panel-raised/80 rounded-full px-2.5 py-1 transition-colors"
-            >
-              Report
-            </button>
-          )}
-          {canDeletePost && (
-            <button
-              disabled={pending}
-              onClick={() => startTransition(() => { deletePost(post.id, profileId); })}
-              className="font-data text-[11px] text-cream/80 hover:text-ember bg-panel-raised hover:bg-panel-raised/80 rounded-full px-2.5 py-1 transition-colors"
-            >
-              Delete
-            </button>
-          )}
+          <ActionMenu
+            items={[
+              ...(isMine && !editing
+                ? [
+                    {
+                      label: "Edit",
+                      icon: <EditIcon />,
+                      onClick: () => {
+                        setDraft(body);
+                        setEditing(true);
+                      },
+                    },
+                  ]
+                : []),
+              ...(!reported && currentUserId && currentUserId !== post.author_id
+                ? [
+                    {
+                      label: "Report",
+                      icon: <FlagIcon />,
+                      onClick: () => {
+                        startTransition(() => {
+                          reportContent("post", post.id, profileId);
+                          setReported(true);
+                        });
+                      },
+                    },
+                  ]
+                : []),
+              ...(canDeletePost
+                ? [
+                    {
+                      label: "Delete",
+                      icon: <TrashIcon />,
+                      danger: true,
+                      onClick: () => startTransition(() => { deletePost(post.id, profileId); }),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         </div>
       </div>
 
@@ -197,9 +205,10 @@ export default function PostCard({
                 {canDeleteComment && (
                   <button
                     onClick={() => startTransition(() => { deleteComment(c.id, profileId); })}
-                    className="font-data text-[10px] text-sage hover:text-ember transition-colors"
+                    aria-label="Delete comment"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-sage hover:text-ember hover:bg-panel-raised transition-colors shrink-0"
                   >
-                    ×
+                    <TrashIcon size={11} />
                   </button>
                 )}
               </div>
@@ -240,5 +249,35 @@ export default function PostCard({
         )}
       </div>
     </div>
+  );
+}
+
+function EditIcon({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function FlagIcon({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path d="M2 1v12M2 1.5h9l-2 3 2 3H2" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TrashIcon({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path
+        d="M2 3.5h10M5.5 3.5V2h3v1.5M3.5 3.5l.5 8.5h6l.5-8.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

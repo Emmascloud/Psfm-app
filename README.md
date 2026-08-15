@@ -24,9 +24,10 @@ Next.js (App Router) + Supabase.
     seeds the roster with the original 152-person WhatsApp list)
 13. `supabase/migration_13_rls_hardening.sql` (4 sections) — **new
     this round**, see "Security pass" below
-14. `supabase/migration_14_events.sql` (3 sections) — **new this
-    round**, events + RSVPs. Requires migration 10 to already be
-    applied (it reuses that migration's push-notify function).
+14. `supabase/migration_14_events.sql` (3 sections)
+15. `supabase/migration_15_birthday_cron.sql` (1 section) — **new
+    this round**, tracks which birthday posts have already gone out
+    so the daily cron never double-posts.
 
 ### Making yourself an admin
 
@@ -281,6 +282,41 @@ costs. Flagging it now so it's a deliberate choice, not an oversight.
 - New events trigger a push notification to everyone, reusing the same
   infrastructure from migration 10 — no additional webhook setup
   needed if that's already running.
+
+## Visual overhaul this round
+
+- **Persistent top bar, every page, every breakpoint.** Desktop
+  previously only had the sidebar — there was no header above the
+  content itself. Now every page has a floating, blurred, shadowed bar
+  showing the current section's name plus the bell and theme toggle,
+  the same treatment on mobile and desktop.
+- **Floating cards.** Posts, member rows, event cards, connections, and
+  inbox conversations now lift and deepen their shadow on hover
+  (`.card-float` in `globals.css`) instead of sitting flat.
+- **Advanced action menus.** Edit/Delete/Report on posts, chat
+  messages, and DMs are now a proper kebab (⋯) dropdown with icons,
+  closing on outside click — not plain text links in a row.
+- **Profile page redesign** — a cover-banner + floating-avatar layout
+  (the style you referenced), with birthday/anniversary shown as a
+  compact "bio" line and stats/actions arranged the way a modern
+  profile header usually is.
+
+## Auto-generated birthday posts
+
+A scheduled job (`vercel.json`'s cron, calling
+`/api/cron/birthdays` once a day) checks who has a birthday that day
+in Africa/Lagos time, posts a celebratory message to their timeline
+automatically (one of a few varied templates, not the same line every
+time), and sends a push notification to the rest of the family — all
+reusing the push infrastructure from migration 10, so no separate
+setup for that part.
+
+**Two things to add** to Vercel's environment variables (already in
+`.env.local.example`): `CRON_SECRET` — this is what proves a request
+really came from Vercel's scheduler and not someone who found the URL;
+Vercel sends it automatically once the variable exists. No dashboard
+toggle needed beyond that and `vercel.json` being present in the repo,
+which it now is.
 
 ## Deliberately not in this round
 

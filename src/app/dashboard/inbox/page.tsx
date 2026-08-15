@@ -56,7 +56,7 @@ export default async function InboxPage() {
               <Link
                 key={otherId}
                 href={`/dashboard/inbox/${otherId}`}
-                className="flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
+                className="card-float flex items-center gap-3 rounded-xl bg-panel px-4 py-3 hover:bg-panel-raised transition-colors"
               >
                 <PresentAvatar userId={otherId} url={other?.avatar_url} name={other?.full_name ?? "?"} size={40} />
                 <div className="min-w-0 flex-1">

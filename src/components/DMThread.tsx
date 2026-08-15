@@ -9,6 +9,7 @@ import {
   markConversationRead,
 } from "@/lib/dms/actions";
 import type { DirectMessage } from "@/lib/types";
+import ActionMenu from "@/components/ActionMenu";
 
 function timeOf(iso: string) {
   return new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
@@ -123,26 +124,25 @@ export default function DMThread({
                     </span>
                   )}
                 </div>
-                <div className="flex gap-2 mt-0.5 px-1">
-                  {!reported && !mine && (
-                    <button
-                      onClick={() => {
-                        reportDirectMessage(m.id);
-                        setReportedIds((prev) => new Set(prev).add(m.id));
-                      }}
-                      className="font-data text-[10px] text-sage/70 hover:text-ember transition-colors"
-                    >
-                      Report
-                    </button>
-                  )}
-                  {canDelete && (
-                    <button
-                      onClick={() => deleteDirectMessage(m.id)}
-                      className="font-data text-[10px] text-sage/70 hover:text-ember transition-colors"
-                    >
-                      Delete
-                    </button>
-                  )}
+                <div className="mt-0.5 px-1">
+                  <ActionMenu
+                    items={[
+                      ...(!reported && !mine
+                        ? [
+                            {
+                              label: "Report",
+                              onClick: () => {
+                                reportDirectMessage(m.id);
+                                setReportedIds((prev) => new Set(prev).add(m.id));
+                              },
+                            },
+                          ]
+                        : []),
+                      ...(canDelete
+                        ? [{ label: "Delete", danger: true, onClick: () => deleteDirectMessage(m.id) }]
+                        : []),
+                    ]}
+                  />
                 </div>
               </div>
             </div>

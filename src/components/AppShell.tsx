@@ -38,6 +38,9 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
     ? [...BASE_LINKS, { href: "/admin", label: "Admin", key: null }]
     : BASE_LINKS;
 
+  const current = [...allLinks].sort((a, b) => b.href.length - a.href.length).find((l) => pathname.startsWith(l.href));
+  const pageTitle = current?.label ?? "PSMF Family";
+
   // Clear a section's badge once the person actually visits it.
   useEffect(() => {
     setBadges((prev) => {
@@ -102,96 +105,98 @@ export default function AppShell({ user, children }: { user: NavUser; children: 
             <Link
               key={l.href}
               href={l.href}
-              className={`font-data text-sm rounded-lg px-3 py-2 transition-colors flex items-center justify-between ${
+              className={`font-data text-sm rounded-lg px-3 py-2 transition-all flex items-center justify-between ${
                 pathname === l.href
-                  ? "bg-panel-raised text-marigold"
-                  : "text-sage hover:text-cream hover:bg-panel"
+                  ? "bg-panel-raised text-marigold shadow-sm shadow-black/20"
+                  : "text-sage hover:text-cream hover:bg-panel hover:translate-x-0.5"
               }`}
             >
               {l.label}
               {l.key && badges[l.key] && (
-                <span className="w-2 h-2 rounded-full bg-ember" aria-label="New activity" />
+                <span className="w-2 h-2 rounded-full bg-ember animate-pulse" aria-label="New activity" />
               )}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center justify-between pt-6 border-t border-hairline">
-          <div className="flex items-center gap-3 min-w-0">
-            <Avatar url={user.avatarUrl} name={user.name} size={36} />
-            <div className="min-w-0">
-              <p className="font-body text-sm text-cream truncate">{user.name}</p>
-              <form action={signOut}>
-                <button className="font-data text-xs text-sage hover:text-ember transition-colors">
-                  Sign out
-                </button>
-              </form>
-            </div>
+        <div className="flex items-center gap-3 pt-6 border-t border-hairline">
+          <Avatar url={user.avatarUrl} name={user.name} size={36} />
+          <div className="min-w-0 flex-1">
+            <p className="font-body text-sm text-cream truncate">{user.name}</p>
+            <form action={signOut}>
+              <button className="font-data text-xs text-sage hover:text-ember transition-colors">
+                Sign out
+              </button>
+            </form>
           </div>
-          <NotificationBell />
-          <ThemeToggle />
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <header className="lg:hidden sticky top-0 z-20 bg-ink/95 backdrop-blur border-b border-hairline px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="font-display text-lg text-cream">
-          PSMF <span className="text-marigold">Family</span>
-        </Link>
-        <div className="flex items-center gap-1">
-          <NotificationBell />
-          <ThemeToggle />
-          <button
-            onClick={() => setOpen(!open)}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            className="text-cream p-2 -mr-2 relative"
-          >
-            {Object.values(badges).some(Boolean) && !open && (
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-ember" />
-            )}
-            {open ? (
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path d="M2 2l18 18M20 2L2 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path d="M2 5h18M2 11h18M2 17h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </header>
+      <div className="flex flex-col min-w-0">
+        {/* Persistent top bar — every page, every breakpoint. On
+            desktop it floats above the content as its own card; on
+            mobile it's the app's main header with the menu toggle. */}
+        <header className="sticky top-0 z-20 mx-3 mt-3 lg:mx-6 lg:mt-6 rounded-2xl bg-panel/90 backdrop-blur border border-hairline shadow-lg shadow-black/20 px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="font-display text-lg text-cream lg:hidden">
+            PSMF <span className="text-marigold">Family</span>
+          </Link>
+          <h1 className="hidden lg:block font-display text-lg text-cream">{pageTitle}</h1>
 
-      {open && (
-        <div className="lg:hidden fixed inset-0 top-[57px] z-10 bg-ink px-4 py-4 overflow-y-auto">
-          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-hairline">
-            <Avatar url={user.avatarUrl} name={user.name} size={40} />
-            <p className="font-body text-cream">{user.name}</p>
+          <div className="flex items-center gap-1">
+            <NotificationBell />
+            <ThemeToggle />
+            <button
+              onClick={() => setOpen(!open)}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              className="lg:hidden text-cream p-2 -mr-2 relative"
+            >
+              {Object.values(badges).some(Boolean) && !open && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-ember" />
+              )}
+              {open ? (
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M2 2l18 18M20 2L2 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M2 5h18M2 11h18M2 17h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
           </div>
-          <nav className="flex flex-col gap-1">
-            {allLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className={`font-data text-sm rounded-lg px-3 py-3 transition-colors flex items-center justify-between ${
-                  pathname === l.href ? "bg-panel-raised text-marigold" : "text-sage hover:text-cream"
-                }`}
-              >
-                {l.label}
-                {l.key && badges[l.key] && (
-                  <span className="w-2 h-2 rounded-full bg-ember" aria-label="New activity" />
-                )}
-              </Link>
-            ))}
-          </nav>
-          <form action={signOut} className="mt-4 pt-4 border-t border-hairline">
-            <button className="font-data text-sm text-ember">Sign out</button>
-          </form>
-        </div>
-      )}
+        </header>
 
-      <main className="min-w-0">{children}</main>
+        {open && (
+          <div className="lg:hidden fixed inset-0 top-[73px] z-10 bg-ink px-4 py-4 overflow-y-auto">
+            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-hairline">
+              <Avatar url={user.avatarUrl} name={user.name} size={40} />
+              <p className="font-body text-cream">{user.name}</p>
+            </div>
+            <nav className="flex flex-col gap-1">
+              {allLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className={`font-data text-sm rounded-lg px-3 py-3 transition-colors flex items-center justify-between ${
+                    pathname === l.href ? "bg-panel-raised text-marigold" : "text-sage hover:text-cream"
+                  }`}
+                >
+                  {l.label}
+                  {l.key && badges[l.key] && (
+                    <span className="w-2 h-2 rounded-full bg-ember" aria-label="New activity" />
+                  )}
+                </Link>
+              ))}
+            </nav>
+            <form action={signOut} className="mt-4 pt-4 border-t border-hairline">
+              <button className="font-data text-sm text-ember">Sign out</button>
+            </form>
+          </div>
+        )}
+
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
     </div>
     </PresenceProvider>
   );

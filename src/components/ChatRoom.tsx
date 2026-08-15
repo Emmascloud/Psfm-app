@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { usePresence } from "@/components/PresenceProvider";
 import { sendMessage, deleteMessage, reportMessage } from "@/lib/chat/actions";
 import Avatar from "@/components/Avatar";
+import ActionMenu from "@/components/ActionMenu";
 import type { Message } from "@/lib/types";
 
 type Author = { id: string; full_name: string; avatar_url: string | null };
@@ -158,26 +159,25 @@ export default function ChatRoom({
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-2 mt-0.5 px-1">
-                    {!reported && !mine && (
-                      <button
-                        onClick={() => {
-                          reportMessage(m.id);
-                          setReportedIds((prev) => new Set(prev).add(m.id));
-                        }}
-                        className="font-data text-[10px] text-sage/70 hover:text-ember transition-colors"
-                      >
-                        Report
-                      </button>
-                    )}
-                    {canDelete && (
-                      <button
-                        onClick={() => deleteMessage(m.id)}
-                        className="font-data text-[10px] text-sage/70 hover:text-ember transition-colors"
-                      >
-                        Delete
-                      </button>
-                    )}
+                  <div className="mt-0.5 px-1">
+                    <ActionMenu
+                      items={[
+                        ...(!reported && !mine
+                          ? [
+                              {
+                                label: "Report",
+                                onClick: () => {
+                                  reportMessage(m.id);
+                                  setReportedIds((prev) => new Set(prev).add(m.id));
+                                },
+                              },
+                            ]
+                          : []),
+                        ...(canDelete
+                          ? [{ label: "Delete", danger: true, onClick: () => deleteMessage(m.id) }]
+                          : []),
+                      ]}
+                    />
                   </div>
                 </div>
               </div>

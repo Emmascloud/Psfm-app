@@ -41,7 +41,7 @@ export default async function EventsPage() {
             const going = (rsvpsByEvent.get(e.id) ?? []).filter((r) => r.status === "going").length;
             const mine = (rsvpsByEvent.get(e.id) ?? []).find((r) => r.user_id === user?.id);
             return (
-              <div key={e.id} className="rounded-2xl bg-panel p-5">
+              <div key={e.id} className="card-float rounded-2xl bg-panel p-5">
                 <p className="font-data text-xs text-marigold mb-1">
                   {new Date(e.starts_at).toLocaleString(undefined, {
                     weekday: "short",

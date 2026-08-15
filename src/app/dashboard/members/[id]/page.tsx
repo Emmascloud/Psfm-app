@@ -78,98 +78,109 @@ export default async function MemberProfilePage({
   const isOwnProfile = user?.id === id;
 
   return (
-    <div className="px-6 py-8 lg:px-10 lg:py-10 max-w-2xl">
-      <Link href="/dashboard/members" className="font-data text-sm text-sage hover:text-cream mb-6 inline-block">
-        ← All members
-      </Link>
+    <div className="max-w-2xl mx-auto pb-10">
+      <div className="px-6 lg:px-10 pt-4">
+        <Link href="/dashboard/members" className="font-data text-sm text-sage hover:text-cream mb-2 inline-block">
+          ← All members
+        </Link>
+      </div>
 
-      <div className="rounded-2xl bg-panel p-8 text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <PresentAvatar userId={profile.id} url={profile.avatar_url} name={profile.full_name} size={72} />
-        </div>
-        <h1 className="font-display text-2xl text-cream mb-1">{profile.full_name}</h1>
-        {profile.status && (
-          <p className="font-data text-xs text-marigold uppercase tracking-wide mb-3">
-            {profile.status}
-          </p>
-        )}
+      <div className="rounded-2xl overflow-hidden bg-panel mb-8 mx-6 lg:mx-10">
+        {/* Cover banner */}
+        <div
+          className="h-28 sm:h-36"
+          style={{
+            background:
+              "linear-gradient(135deg, var(--marigold) 0%, var(--panel-raised) 55%, var(--ink-soft) 100%)",
+          }}
+        />
 
-        <div className="flex items-center justify-center gap-4 mb-4 font-data text-xs text-sage">
-          {isOwnProfile ? (
-            <>
-              <Link href="/dashboard/connections?tab=followers" className="hover:text-cream transition-colors">
-                <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
-              </Link>
-              <Link href="/dashboard/connections?tab=following" className="hover:text-cream transition-colors">
-                <span className="text-cream font-medium">{following?.length ?? 0}</span> following
-              </Link>
-            </>
-          ) : (
-            <>
-              <span>
-                <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
-              </span>
-              <span>
-                <span className="text-cream font-medium">{following?.length ?? 0}</span> following
-              </span>
-            </>
-          )}
-        </div>
-
-        {!isOwnProfile && user && (
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <FollowButton targetId={profile.id} initiallyFollowing={isFollowing} />
-            <Link
-              href={`/dashboard/inbox/${profile.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full bg-panel-raised px-4 py-1.5 font-data text-xs font-medium text-cream hover:bg-panel-raised/70 transition-colors"
-            >
-              Message
-            </Link>
+        <div className="px-6 pb-6">
+          <div className="flex items-end justify-between -mt-10 sm:-mt-12 mb-3">
+            <div className="rounded-full ring-4 ring-panel">
+              <PresentAvatar userId={profile.id} url={profile.avatar_url} name={profile.full_name} size={84} />
+            </div>
+            {!isOwnProfile && user ? (
+              <div className="flex items-center gap-2 pb-1">
+                <FollowButton targetId={profile.id} initiallyFollowing={isFollowing} />
+                <Link
+                  href={`/dashboard/inbox/${profile.id}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-4 py-1.5 font-data text-xs font-medium text-cream hover:bg-panel-raised transition-colors"
+                >
+                  Message
+                </Link>
+              </div>
+            ) : (
+              isOwnProfile && (
+                <Link
+                  href="/dashboard/profile"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-4 py-1.5 font-data text-xs font-medium text-cream hover:bg-panel-raised transition-colors mb-1"
+                >
+                  Edit profile
+                </Link>
+              )
+            )}
           </div>
-        )}
-        <div className="text-left space-y-3 mt-6 pt-6 border-t border-hairline">
-          <Row label="Birthday" value={`${ordinal(profile.birth_day)} ${monthName(profile.birth_month)}`} />
-          {profile.anniversary_month && profile.anniversary_day && (
-            <Row
-              label="Anniversary"
-              value={`${ordinal(profile.anniversary_day)} ${monthName(profile.anniversary_month)}`}
-            />
+
+          <h1 className="font-display text-2xl text-cream mb-0.5">{profile.full_name}</h1>
+          {profile.status && (
+            <p className="font-data text-xs text-marigold uppercase tracking-wide mb-3">
+              {profile.status}
+            </p>
           )}
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-body text-sm text-sage mb-4">
+            <span>🎂 {ordinal(profile.birth_day)} {monthName(profile.birth_month)}</span>
+            {profile.anniversary_month && profile.anniversary_day && (
+              <span>💍 {ordinal(profile.anniversary_day)} {monthName(profile.anniversary_month)}</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4 font-data text-xs text-sage">
+            {isOwnProfile ? (
+              <>
+                <Link href="/dashboard/connections?tab=followers" className="hover:text-cream transition-colors">
+                  <span className="text-cream font-medium">{followers?.length ?? 0}</span> followers
+                </Link>
+                <Link href="/dashboard/connections?tab=following" className="hover:text-cream transition-colors">
+                  <span className="text-cream font-medium">{following?.length ?? 0}</span> following
+                </Link>
+              </>
+            ) : (
+              <>
+                <span><span className="text-cream font-medium">{followers?.length ?? 0}</span> followers</span>
+                <span><span className="text-cream font-medium">{following?.length ?? 0}</span> following</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <h2 className="font-display text-xl text-cream mb-4">Timeline</h2>
-      {isOwnProfile && <PostForm profileId={id} />}
+      <div className="px-6 lg:px-10">
+        <h2 className="font-display text-xl text-cream mb-4">Timeline</h2>
+        {isOwnProfile && <PostForm profileId={id} />}
 
-      <div className="space-y-4">
-        {(posts ?? []).map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            comments={commentsByPost.get(post.id) ?? []}
-            authorsById={authorsById}
-            profileId={id}
-            currentUserId={user?.id ?? null}
-            isAdmin={!!me?.is_admin}
-            reactionCounts={reactionCountsByPost.get(post.id)}
-            myReaction={myReactionByPost.get(post.id)}
-          />
-        ))}
-        {(posts ?? []).length === 0 && (
-          <p className="font-body text-sage text-sm">
-            {isOwnProfile ? "Nothing here yet — share your first update." : "No posts yet."}
-          </p>
-        )}
+        <div className="space-y-4">
+          {(posts ?? []).map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              comments={commentsByPost.get(post.id) ?? []}
+              authorsById={authorsById}
+              profileId={id}
+              currentUserId={user?.id ?? null}
+              isAdmin={!!me?.is_admin}
+              reactionCounts={reactionCountsByPost.get(post.id)}
+              myReaction={myReactionByPost.get(post.id)}
+            />
+          ))}
+          {(posts ?? []).length === 0 && (
+            <p className="font-body text-sage text-sm">
+              {isOwnProfile ? "Nothing here yet — share your first update." : "No posts yet."}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between">
-      <span className="font-body text-sm text-sage">{label}</span>
-      <span className="font-data text-sm text-cream">{value}</span>
     </div>
   );
 }

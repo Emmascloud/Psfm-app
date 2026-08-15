@@ -35,7 +35,7 @@ export default async function DashboardPage() {
       )}
 
       <section className="grid lg:grid-cols-[1fr_1.15fr] gap-6 lg:gap-8 items-start">
-        <div className="rounded-2xl bg-panel p-6">
+        <div className="card-float rounded-2xl bg-panel p-6">
           <h2 className="font-display text-xl text-cream mb-4">Coming up</h2>
           <ol className="space-y-2">
             {upcoming.map(({ p, until }) => (
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
           </ol>
         </div>
 
-        <div className="rounded-2xl bg-panel p-6">
+        <div className="card-float rounded-2xl bg-panel p-6">
           <YearWheel profiles={all} />
         </div>
       </section>

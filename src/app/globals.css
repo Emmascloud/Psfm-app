@@ -94,6 +94,16 @@ body {
   color: var(--ink);
 }
 
+/* Floating-card feel for post/list/event surfaces — lift + deepen
+   shadow on hover, used across the feed, members, events, etc. */
+.card-float {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card-float:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px -14px rgba(0, 0, 0, 0.55);
+}
+
 :focus-visible {
   outline: 2px solid var(--marigold);
   outline-offset: 3px;
